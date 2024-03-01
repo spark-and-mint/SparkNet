@@ -1,22 +1,22 @@
 import { UserNav } from "@/components/shared/UserNav"
-import { Link, Outlet, useLocation } from "react-router-dom"
-import { cn } from "@/lib/utils"
+import { Link, NavLink, Outlet } from "react-router-dom"
+// import { cn } from "@/lib/utils"
 
 const RootLayout = () => {
-  const location = useLocation()
+  // const location = useLocation()
   const links = [
     {
       name: "Members",
       href: "/",
     },
     {
-      name: "Work opportunities",
+      name: "Clients",
       href: "/clients",
     },
   ]
 
   return (
-    <div className="pt-12 px-48 w-full">
+    <div className="pt-12 px-32 pb-24 w-full">
       <div className="relative flex items-center justify-between pb-12">
         <div className="flex items-center gap-3">
           <Link to="/">
@@ -31,25 +31,24 @@ const RootLayout = () => {
 
         <div className="absolute left-1/2 -translate-x-1/2 flex gap-2">
           {links.map((link) => (
-            <Link
+            <NavLink
               to={link.href}
               key={link.href}
-              className={cn(
-                "flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary",
-                location.pathname === link.href
-                  ? "bg-muted font-medium text-primary"
-                  : "text-muted-foreground"
-              )}
+              className={({ isActive }) =>
+                `flex h-7 items-center justify-center rounded-full px-4 text-center text-sm transition-colors hover:text-primary text-muted-foreground ${
+                  isActive && "bg-muted font-medium text-primary"
+                }`
+              }
             >
               {link.name}
-            </Link>
+            </NavLink>
           ))}
         </div>
 
         <UserNav />
       </div>
 
-      <section className="flex flex-1 h-full w-full">
+      <section>
         <Outlet />
       </section>
     </div>

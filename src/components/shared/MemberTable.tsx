@@ -62,16 +62,28 @@ import { useState } from "react"
 
 const tempClients: IClient[] = [
   {
-    name: "Aave",
-  },
-  {
     name: "OpenAI",
+    logo: "",
+    members: [],
+    resources: [],
   },
   {
-    name: "Talent Proposal Deck",
+    name: "Spark + Mint",
+    logo: "",
+    members: [],
+    resources: [],
   },
   {
     name: "Celo",
+    logo: "",
+    members: [],
+    resources: [],
+  },
+  {
+    name: "Aave",
+    logo: "",
+    members: [],
+    resources: [],
   },
 ]
 
@@ -84,7 +96,7 @@ const tempMembers: IMember[] = [
     assignedTo: null,
     contractSigned: false,
     applicationStatus: "form completed",
-    imageUrl: "",
+    imageUrl: "/assets/avatars/01.png",
   },
   {
     id: "2",
@@ -94,7 +106,7 @@ const tempMembers: IMember[] = [
     assignedTo: null,
     contractSigned: false,
     applicationStatus: "form completed",
-    imageUrl: "",
+    imageUrl: "/assets/avatars/02.png",
   },
   {
     id: "5",
@@ -104,7 +116,7 @@ const tempMembers: IMember[] = [
     assignedTo: null,
     contractSigned: false,
     applicationStatus: "1on1 done",
-    imageUrl: "",
+    imageUrl: "/assets/avatars/03.png",
   },
   {
     id: "4",
@@ -114,17 +126,17 @@ const tempMembers: IMember[] = [
     assignedTo: null,
     contractSigned: true,
     applicationStatus: "accepted",
-    imageUrl: "",
+    imageUrl: "/assets/avatars/04.png",
   },
   {
     id: "3",
     name: "Renata Enriquez",
     email: "renata@sparkandmint.com",
     primaryRole: "Product Designer",
-    assignedTo: "Talent Proposal Deck",
+    assignedTo: "Spark + Mint",
     contractSigned: true,
     applicationStatus: "accepted",
-    imageUrl: "",
+    imageUrl: "/assets/avatars/01.png",
   },
 ]
 
@@ -161,16 +173,20 @@ const MemberTable = () => {
     {
       accessorKey: "name",
       header: "Member",
-      cell: ({ row }) => (
-        <div className="flex flex-col gap-2 w-[160px]">
-          <p className="text-sm font-medium leading-none">
-            {row.getValue("name")}
-          </p>
-          <p className="text-xs leading-none text-muted-foreground">
-            {members.find((member) => member.id === row.original.id)?.email}
-          </p>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const member = members.find((member) => member.id === row.original.id)
+        return (
+          <div className="flex items-center gap-2 w-[200px]">
+            <img src={member?.imageUrl} alt="avatar" className="w-10 h-10" />
+            <div className="flex flex-col gap-2">
+              <p className="text-sm font-medium leading-none">{member?.name}</p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {member?.email}
+              </p>
+            </div>
+          </div>
+        )
+      },
     },
     {
       accessorKey: "primaryRole",
@@ -187,7 +203,9 @@ const MemberTable = () => {
         )
       },
       cell: ({ row }) => (
-        <div className="capitalize">{row.getValue("primaryRole")}</div>
+        <div className="w-[180px] capitalize">
+          {row.getValue("primaryRole")}
+        </div>
       ),
     },
     {
@@ -225,14 +243,18 @@ const MemberTable = () => {
       accessorKey: "applicationStatus",
       header: ({ column }) => {
         return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="-ml-4"
-          >
-            Application status
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
+          <div className="flex justify-center">
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="-ml-4"
+            >
+              Application status
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          </div>
         )
       },
       cell: ({ row }) => {

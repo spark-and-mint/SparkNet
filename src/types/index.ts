@@ -20,6 +20,8 @@ export type IMember = {
 }
 
 export type IClient = {
+  id: string
+  slug: string
   name: string
   logo: string
   members: IMember[]

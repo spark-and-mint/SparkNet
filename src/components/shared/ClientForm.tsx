@@ -16,12 +16,21 @@ import Loader from "./Loader"
 const tempClients: IClient[] = [
   {
     name: "OpenAI",
+    logo: "",
+    members: [],
+    resources: [],
   },
   {
     name: "Talent Proposal Deck",
+    logo: "",
+    members: [],
+    resources: [],
   },
   {
     name: "Celo",
+    logo: "",
+    members: [],
+    resources: [],
   },
 ]
 
