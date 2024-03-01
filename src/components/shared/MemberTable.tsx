@@ -28,7 +28,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
-import { ArrowUpDown, MoreHorizontal, PlusIcon } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal, PlusIcon, RotateCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -55,93 +55,69 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { IClient, IMember } from "@/types"
+import { IClient } from "@/types"
 import { Badge } from "@/components/ui/badge"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useGetMembers } from "@/lib/react-query/queries"
+import { Models } from "appwrite"
 // import { useGetMembers } from "@/lib/react-query/queries"
 
-const tempClients: IClient[] = [
-  {
-    name: "OpenAI",
-    logo: "",
-    members: [],
-    resources: [],
-  },
-  {
-    name: "Spark + Mint",
-    logo: "",
-    members: [],
-    resources: [],
-  },
-  {
-    name: "Celo",
-    logo: "",
-    members: [],
-    resources: [],
-  },
-  {
-    name: "Aave",
-    logo: "",
-    members: [],
-    resources: [],
-  },
-]
-
-const tempMembers: IMember[] = [
-  {
-    id: "1",
-    name: "Jane Doe",
-    email: "jane@email.com",
-    primaryRole: "Product Design Lead",
-    assignedTo: null,
-    contractSigned: false,
-    applicationStatus: "form completed",
-    imageUrl: "/assets/avatars/01.png",
-  },
-  {
-    id: "2",
-    name: "Michael Johnson",
-    email: "michael@email.com",
-    primaryRole: "Blockchain Developer",
-    assignedTo: null,
-    contractSigned: false,
-    applicationStatus: "form completed",
-    imageUrl: "/assets/avatars/02.png",
-  },
-  {
-    id: "5",
-    name: "David Wilson",
-    email: "david@email.com",
-    primaryRole: "UX Designer",
-    assignedTo: null,
-    contractSigned: false,
-    applicationStatus: "1on1 done",
-    imageUrl: "/assets/avatars/03.png",
-  },
-  {
-    id: "4",
-    name: "Emily Davis",
-    email: "emily@email.com",
-    primaryRole: "Senior Product Manager",
-    assignedTo: null,
-    contractSigned: true,
-    applicationStatus: "accepted",
-    imageUrl: "/assets/avatars/04.png",
-  },
-  {
-    id: "3",
-    name: "Renata Enriquez",
-    email: "renata@sparkandmint.com",
-    primaryRole: "Product Designer",
-    assignedTo: "Spark + Mint",
-    contractSigned: true,
-    applicationStatus: "accepted",
-    imageUrl: "/assets/avatars/01.png",
-  },
-]
+// const tempMembers: IMember[] = [
+//   {
+//     id: "1",
+//     name: "Jane Doe",
+//     email: "jane@email.com",
+//     primaryRole: "Product Design Lead",
+//     clients: [],
+//     contractSigned: false,
+//     applicationStatus: "form completed",
+//     avatarUrl: "/assets/avatars/01.png",
+//   },
+//   {
+//     id: "2",
+//     name: "Michael Johnson",
+//     email: "michael@email.com",
+//     primaryRole: "Blockchain Developer",
+//     clients: [],
+//     contractSigned: false,
+//     applicationStatus: "form completed",
+//     avatarUrl: "/assets/avatars/02.png",
+//   },
+//   {
+//     id: "5",
+//     name: "David Wilson",
+//     email: "david@email.com",
+//     primaryRole: "UX Designer",
+//     clients: [],
+//     contractSigned: false,
+//     applicationStatus: "1on1 done",
+//     avatarUrl: "/assets/avatars/03.png",
+//   },
+//   {
+//     id: "4",
+//     name: "Emily Davis",
+//     email: "emily@email.com",
+//     primaryRole: "Senior Product Manager",
+//     clients: [],
+//     contractSigned: true,
+//     applicationStatus: "accepted",
+//     avatarUrl: "/assets/avatars/04.png",
+//   },
+//   {
+//     id: "3",
+//     name: "Renata Enriquez",
+//     email: "renata@sparkandmint.com",
+//     primaryRole: "Product Designer",
+//     clients: [],
+//     contractSigned: true,
+//     applicationStatus: "accepted",
+//     avatarUrl: "/assets/avatars/01.png",
+//   },
+// ]
 
 const MemberTable = () => {
-  // const { data: members } = useGetMembers()
+  const { data: memberData, isError } = useGetMembers()
+
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -149,8 +125,8 @@ const MemberTable = () => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
-  const [members, setMembers] = useState<IMember[]>(tempMembers)
-  const [clients] = useState<IClient[]>(tempClients)
+  const [members, setMembers] = useState<Models.Document[]>([])
+  const [clients] = useState<IClient[]>([])
 
   const [memberEmail, setMemberEmail] = useState<string>("")
   const [emailClient, setEmailClient] = useState<string>("")
@@ -160,16 +136,15 @@ const MemberTable = () => {
     setMemberEmail(email || "")
     setEmailClient(value)
     setShowEmailDialog(true)
-
-    const memberToUpdate = members.find((member) => member.email === email)
-
-    if (memberToUpdate) {
-      memberToUpdate.assignedTo = value
-      setMembers([...members])
-    }
   }
 
-  const columns: ColumnDef<IMember>[] = [
+  useEffect(() => {
+    if (memberData) {
+      setMembers(memberData.documents)
+    }
+  }, [memberData])
+
+  const columns: ColumnDef<Models.Document>[] = [
     {
       accessorKey: "name",
       header: "Member",
@@ -177,7 +152,11 @@ const MemberTable = () => {
         const member = members.find((member) => member.id === row.original.id)
         return (
           <div className="flex items-center gap-2 w-[200px]">
-            <img src={member?.imageUrl} alt="avatar" className="w-10 h-10" />
+            <img
+              src={member?.avatarUrl}
+              alt="avatar"
+              className="w-10 h-10 rounded-full"
+            />
             <div className="flex flex-col gap-2">
               <p className="text-sm font-medium leading-none">{member?.name}</p>
               <p className="text-xs leading-none text-muted-foreground">
@@ -345,6 +324,17 @@ const MemberTable = () => {
     },
   })
 
+  if (isError) {
+    return (
+      <div className="flex items-center justify-center h-96 text-center border">
+        <p>
+          Error getting members. Check the JavaScript console for errors (option
+          + cmd + J) and Contact Kevin!
+        </p>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="w-full mt-4">
@@ -406,9 +396,12 @@ const MemberTable = () => {
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-24 text-center"
+                    className="h-48 text-center"
                   >
-                    No results.
+                    <div className="flex items-center justify-center gap-1">
+                      <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                      Loading members...
+                    </div>
                   </TableCell>
                 </TableRow>
               )}

@@ -1,9 +1,19 @@
 import { ID, Query } from "appwrite"
-import { appwriteConfig, account, databases, avatars } from "./config"
+import { appwriteConfig, account, databases, storage } from "./config"
 import { INewMember } from "@/types"
 
 export async function createMemberAccount(member: INewMember) {
   try {
+    const uploadedFile = await uploadFile(member.file[0])
+
+    if (!uploadedFile) throw Error
+
+    const fileUrl = getFilePreview(uploadedFile.$id)
+    if (!fileUrl) {
+      await deleteFile(uploadedFile.$id)
+      throw Error
+    }
+
     const newAccount = await account.create(
       ID.unique(),
       member.email,
@@ -13,13 +23,12 @@ export async function createMemberAccount(member: INewMember) {
 
     if (!newAccount) throw Error
 
-    const avatarUrl = avatars.getInitials(member.name)
-
     const newMember = await saveMemberToDB({
       accountId: newAccount.$id,
       email: newAccount.email,
       name: newAccount.name,
-      imageUrl: avatarUrl,
+      primaryRole: member.primaryRole,
+      avatarUrl: fileUrl,
     })
 
     return newMember
@@ -33,9 +42,11 @@ export async function saveMemberToDB(member: {
   accountId: string
   email: string
   name: string
-  imageUrl: URL
+  primaryRole: string
+  avatarUrl: URL
 }) {
   try {
+    console.log("saving member to db")
     const newMember = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.memberCollectionId,
@@ -106,10 +117,65 @@ export async function getMembers() {
   const members = await databases.listDocuments(
     appwriteConfig.databaseId,
     appwriteConfig.memberCollectionId
-    // [Query.orderDesc("createdAt")]
   )
 
   if (!members) throw Error
 
   return members
+}
+
+export async function getClients() {
+  const clients = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.clientCollectionId
+  )
+
+  if (!clients) throw Error
+
+  return clients
+}
+
+export async function uploadFile(file: File) {
+  try {
+    const uploadedFile = await storage.createFile(
+      appwriteConfig.storageId,
+      ID.unique(),
+      file
+    )
+
+    return uploadedFile
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== GET FILE URL
+export function getFilePreview(fileId: string) {
+  try {
+    const fileUrl = storage.getFilePreview(
+      appwriteConfig.storageId,
+      fileId,
+      2000,
+      2000,
+      "top",
+      100
+    )
+
+    if (!fileUrl) throw Error
+
+    return fileUrl
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+// ============================== DELETE FILE
+export async function deleteFile(fileId: string) {
+  try {
+    await storage.deleteFile(appwriteConfig.storageId, fileId)
+
+    return { status: "ok" }
+  } catch (error) {
+    console.log(error)
+  }
 }

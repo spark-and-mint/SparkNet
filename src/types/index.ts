@@ -2,30 +2,35 @@ export type INewMember = {
   email: string
   password: string
   name: string
-}
-
-export type INewClient = {
-  name: string
+  file: File[]
+  primaryRole: string
 }
 
 export type IMember = {
   id: string
   email: string
   name: string
-  imageUrl: string
+  avatarUrl: string
   primaryRole: string
-  assignedTo: null | string
+  clients: IClient[]
   contractSigned: boolean
-  applicationStatus: string
+  applicationStatus: "form completed" | "1on1 done" | "accepted" | "rejected"
+}
+
+export type INewClient = {
+  name: string
+  slug: string
+  logoUrl: string
 }
 
 export type IClient = {
   id: string
-  slug: string
   name: string
-  logo: string
+  slug: string
+  logoUrl: string
+  description: string
   members: IMember[]
-  resources: IResource[]
+  resources: string[]
 }
 
 export type IResource = {

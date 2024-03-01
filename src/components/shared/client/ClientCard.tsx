@@ -5,26 +5,27 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { IClient, IMember } from "@/types"
-import { Button } from "../ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
+import { IMember } from "@/types"
+import { Button } from "../../ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../ui/tooltip"
+} from "../../ui/tooltip"
 import { Link } from "react-router-dom"
+import { Models } from "appwrite"
 
-const ClientCard = ({ client }: { client: IClient }) => {
+const ClientCard = ({ client }: { client: Models.Document }) => {
   return (
     <Card className="flex flex-col justify-between h-full">
       <CardHeader>
         <CardTitle>
           <div className="flex items-center justify-between">
             {client.name}
-            {client.logo ? (
-              <img src={client.logo} className="w-12 h-12 rounded-full" />
+            {client.logoUrl ? (
+              <img src={client.logoUrl} className="w-12 h-12 rounded-full" />
             ) : (
               <Avatar>
                 <AvatarFallback>
@@ -49,7 +50,7 @@ const ClientCard = ({ client }: { client: IClient }) => {
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Avatar>
-                            <AvatarImage src={member.imageUrl} />
+                            <AvatarImage src={member.avatarUrl} />
                           </Avatar>
                         </TooltipTrigger>
                         <TooltipContent>

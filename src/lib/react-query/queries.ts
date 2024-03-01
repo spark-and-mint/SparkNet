@@ -2,6 +2,7 @@ import { INewMember } from "@/types"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import {
   createMemberAccount,
+  getClients,
   getMembers,
   signInAccount,
   signOutAccount,
@@ -31,5 +32,12 @@ export const useGetMembers = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_MEMBERS],
     queryFn: getMembers,
+  })
+}
+
+export const useGetClients = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_CLIENTS],
+    queryFn: getClients,
   })
 }

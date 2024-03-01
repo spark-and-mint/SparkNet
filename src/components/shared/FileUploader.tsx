@@ -5,12 +5,12 @@ import { Button } from "../ui/button"
 
 type FileUploaderProps = {
   fieldChange: (files: File[]) => void
-  mediaUrl: string
+  mediaUrl: string | undefined
 }
 
 const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
   const [file, setFile] = useState<File[]>([])
-  const [fileUrl, setFileUrl] = useState<string>(mediaUrl)
+  const [fileUrl, setFileUrl] = useState<string | undefined>(mediaUrl)
 
   const onDrop = useCallback(
     (acceptedFiles: FileWithPath[]) => {
@@ -58,7 +58,7 @@ const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
           <h3 className="mb-2 mt-6">Drag photo here</h3>
           <p className="text-sm mb-6">SVG, PNG, JPG</p>
 
-          <Button>Select from computer</Button>
+          <Button variant="secondary">Select from computer</Button>
         </div>
       )}
     </div>

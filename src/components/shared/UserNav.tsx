@@ -28,7 +28,7 @@ export function UserNav() {
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-9 w-9">
             <AvatarImage
-              src={member.imageUrl || "/assets/avatar.png"}
+              src={member.avatarUrl || "/assets/avatar.png"}
               alt="avatar"
             />
           </Avatar>

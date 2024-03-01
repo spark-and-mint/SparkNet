@@ -12,15 +12,15 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import Loader from "@/components/shared/Loader"
 import { useToast } from "@/components/ui/use-toast"
-
 import {
   useCreateMemberAccount,
   useSignInAccount,
 } from "@/lib/react-query/queries"
 import { SignUpValidation } from "@/lib/validation"
 import { useMemberContext } from "@/context/AuthContext"
+import ProfileUploader from "@/components/shared/ProfileUploader"
+import { RotateCw } from "lucide-react"
 
 const SignUpForm = () => {
   const { toast } = useToast()
@@ -31,6 +31,8 @@ const SignUpForm = () => {
     resolver: zodResolver(SignUpValidation),
     defaultValues: {
       name: "",
+      primaryRole: "",
+      file: [],
       email: "",
       password: "",
     },
@@ -46,7 +48,7 @@ const SignUpForm = () => {
       const newMember = await createMemberAccount(member)
 
       if (!newMember) {
-        console.log("sign up failed")
+        console.log("could not create member account")
         toast({
           title: "Sign up failed. Please try again.",
           variant: "destructive",
@@ -54,15 +56,17 @@ const SignUpForm = () => {
         return
       }
 
+      console.log(newMember)
+
       const session = await signInAccount({
         email: member.email,
         password: member.password,
       })
 
       if (!session) {
-        console.log("no session")
+        console.log("could not login")
         toast({
-          title: "SESSION went wrong. Please try again.",
+          title: "Something went wrong. Please try again.",
           variant: "destructive",
         })
         navigate("/sign-in")
@@ -75,7 +79,6 @@ const SignUpForm = () => {
         form.reset()
         navigate("/")
       } else {
-        console.log("login fail")
         toast({
           title: "Login failed. Please try again.",
           variant: "destructive",
@@ -95,9 +98,37 @@ const SignUpForm = () => {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Name</FormLabel>
+              <FormLabel>Name</FormLabel>
               <FormControl>
-                <Input type="text" className="shad-input" {...field} />
+                <Input type="text" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="primaryRole"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Primary role</FormLabel>
+              <FormControl>
+                <Input type="text" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="file"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Avatar or profile picture</FormLabel>
+              <FormControl>
+                <ProfileUploader fieldChange={field.onChange} mediaUrl="" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,9 +140,9 @@ const SignUpForm = () => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Email</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="text" className="shad-input" {...field} />
+                <Input type="text" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -123,9 +154,9 @@ const SignUpForm = () => {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel className="shad-form_label">Password</FormLabel>
+              <FormLabel>Password</FormLabel>
               <FormControl>
-                <Input type="password" className="shad-input" {...field} />
+                <Input type="password" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -140,7 +171,8 @@ const SignUpForm = () => {
           >
             {isCreatingAccount || isSigningInMember || isMemberLoading ? (
               <div className="flex items-center gap-2">
-                <Loader /> Loading...
+                <RotateCw className="h-4 w-4 animate-spin" />
+                Loading...
               </div>
             ) : (
               "Sign up"

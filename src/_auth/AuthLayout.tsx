@@ -10,8 +10,8 @@ const AuthLayout = () => {
         <Navigate to="/" />
       ) : (
         <>
-          <section className="grid place-items-center w-full">
-            <div className="-mt-16 w-64">
+          <section className="grid place-items-center h-screen w-full">
+            <div className="w-64">
               <h1 className="text-2xl font-semibold mb-8 text-center">
                 SparkNet{" "}
                 <span role="img" aria-label="sparkles">

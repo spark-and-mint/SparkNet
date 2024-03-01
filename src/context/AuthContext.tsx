@@ -4,11 +4,15 @@ import { createContext, useContext, useEffect, useState } from "react"
 import { IMember } from "@/types"
 import { getCurrentMember } from "@/lib/appwrite/api"
 
-export const INITIAL_MEMBER = {
+export const INITIAL_MEMBER: IMember = {
   id: "",
   name: "",
   email: "",
-  imageUrl: "",
+  avatarUrl: "",
+  primaryRole: "",
+  clients: [],
+  contractSigned: false,
+  applicationStatus: "form completed",
 }
 
 const INITIAL_STATE = {
@@ -48,7 +52,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           id: currentAccount.$id,
           name: currentAccount.name,
           email: currentAccount.email,
-          imageUrl: currentAccount.imageUrl,
+          primaryRole: currentAccount.primaryRole,
+          avatarUrl: currentAccount.avatarUrl,
+          clients: currentAccount.clients,
+          contractSigned: currentAccount.contractSigned,
+          applicationStatus: currentAccount.applicationStatus,
         })
         setIsAuthenticated(true)
         return true

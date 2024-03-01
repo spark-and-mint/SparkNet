@@ -21,31 +21,31 @@ const TaskList = () => {
     {
       taskName: "Understand Existing Product",
       status: <Done />,
-      dueDate: "2nd March 2024",
+      hours: "2.5",
     },
 
     {
       taskName: "Design Audit & Improvement Plan",
       status: <InProgress />,
-      dueDate: "9th March 2024",
+      hours: "4",
     },
 
     {
       taskName: "User Research Plan",
       status: <NotStarted />,
-      dueDate: "16th March 2024",
+      hours: "6",
     },
 
     {
       taskName: "Define New Design System",
       status: <NotStarted />,
-      dueDate: "23rd March 2024",
+      hours: "3",
     },
 
     {
       taskName: "Product Strategy Presentation",
       status: <NotStarted />,
-      dueDate: "30th March 2024",
+      hours: "4.5",
     },
   ]
 
@@ -57,7 +57,7 @@ const TaskList = () => {
             <div className="text-sm font-semibold mr-4">{item.taskName}</div>
             {item.status}
           </div>
-          <p className="text-sm text-gray-600">Due: {item.dueDate}</p>
+          <p className="text-sm text-gray-600">Hours: {item.hours}</p>
         </div>
       ))}
     </div>

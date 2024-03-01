@@ -4,7 +4,10 @@ import { Home, Clients, Client } from "./_root/pages"
 import SignUpForm from "./_auth/forms/SignUpForm"
 import AuthLayout from "./_auth/AuthLayout"
 import RootLayout from "./_root/RootLayout"
+import ClientLayout from "./_root/ClientLayout"
 import { Toaster } from "@/components/ui/toaster"
+import ClientForm from "@/components/shared/client/ClientForm"
+import ClientResources from "./components/shared/client/ClientResources"
 import "./globals.css"
 
 const App = () => (
@@ -18,7 +21,15 @@ const App = () => (
       <Route element={<RootLayout />}>
         <Route index element={<Home />} />
         <Route path="/clients" element={<Clients />} />
-        <Route path="/clients/:slug" element={<Client />} />
+
+        <Route element={<ClientLayout />}>
+          <Route path="/clients/:slug" element={<Client />} />
+          <Route path="/clients/:slug/settings" element={<ClientForm />} />
+          <Route
+            path="/clients/:slug/resources"
+            element={<ClientResources />}
+          />
+        </Route>
       </Route>
     </Routes>
 

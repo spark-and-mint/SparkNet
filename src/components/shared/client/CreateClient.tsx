@@ -6,20 +6,22 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card"
-import { Input } from "../ui/input"
-import { Button } from "../ui/button"
+} from "../../ui/card"
+import { Input } from "../../ui/input"
+import { Button } from "../../ui/button"
 import { useState } from "react"
 import { RotateCw } from "lucide-react"
-import { IClient } from "@/types"
 
-interface ICreateClient {
-  setClients: React.Dispatch<React.SetStateAction<IClient[]>>
-}
-
-const CreateClient = ({ setClients }: ICreateClient) => {
+const CreateClient = () => {
   const [clientName, setClientName] = useState("")
   const [loading, setLoading] = useState(false)
+
+  const handleCreateClient = async () => {
+    setLoading(true)
+    const slug = slugify(clientName, { lower: true })
+    console.log(slug)
+    setLoading(false)
+  }
 
   return (
     <Card className="flex flex-col justify-between h-full">
@@ -51,28 +53,11 @@ const CreateClient = ({ setClients }: ICreateClient) => {
         <Button
           className="w-full"
           disabled={loading}
-          onClick={() => {
-            setLoading(true)
-            setTimeout(() => {
-              setClients((prevClients) => [
-                {
-                  id: String(prevClients.length + 1),
-                  name: clientName,
-                  slug: slugify(clientName),
-                  logo: "",
-                  members: [],
-                  resources: [],
-                },
-                ...prevClients,
-              ])
-              setClientName("")
-              setLoading(false)
-            }, 1500)
-          }}
+          onClick={handleCreateClient}
         >
           {loading ? (
             <>
-              <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+              <RotateCw className="mr-1 h-4 w-4 animate-spin" />
               Adding...
             </>
           ) : (
