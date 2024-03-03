@@ -20,14 +20,16 @@ export type IMember = {
 export type INewClient = {
   name: string
   slug: string
-  logoUrl: string
+  file: File[]
 }
 
 export type IClient = {
   id: string
   name: string
   slug: string
-  logoUrl: string
+  logoUrl: URL | string
+  logoId: string
+  file: File[]
   description: string
   members: IMember[]
   resources: string[]

@@ -18,3 +18,12 @@ export const SignInValidation = z.object({
     .string()
     .min(6, { message: "Password must be at least 6 characters long" }),
 })
+
+export const ClientValidation = z.object({
+  name: z
+    .string()
+    .min(2, { message: "Minimum 2 characters." })
+    .max(2200, { message: "Maximum 2,200 caracters" }),
+  slug: z.string(),
+  file: z.custom<File[]>(),
+})

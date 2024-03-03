@@ -12,15 +12,6 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog"
-import {
   Pagination,
   PaginationContent,
   PaginationItem,
@@ -55,68 +46,21 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { IClient } from "@/types"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
-import { useGetMembers } from "@/lib/react-query/queries"
+import {
+  useAssignMemberToClient,
+  useGetClients,
+  useGetMembers,
+} from "@/lib/react-query/queries"
 import { Models } from "appwrite"
-// import { useGetMembers } from "@/lib/react-query/queries"
-
-// const tempMembers: IMember[] = [
-//   {
-//     id: "1",
-//     name: "Jane Doe",
-//     email: "jane@email.com",
-//     primaryRole: "Product Design Lead",
-//     clients: [],
-//     contractSigned: false,
-//     applicationStatus: "form completed",
-//     avatarUrl: "/assets/avatars/01.png",
-//   },
-//   {
-//     id: "2",
-//     name: "Michael Johnson",
-//     email: "michael@email.com",
-//     primaryRole: "Blockchain Developer",
-//     clients: [],
-//     contractSigned: false,
-//     applicationStatus: "form completed",
-//     avatarUrl: "/assets/avatars/02.png",
-//   },
-//   {
-//     id: "5",
-//     name: "David Wilson",
-//     email: "david@email.com",
-//     primaryRole: "UX Designer",
-//     clients: [],
-//     contractSigned: false,
-//     applicationStatus: "1on1 done",
-//     avatarUrl: "/assets/avatars/03.png",
-//   },
-//   {
-//     id: "4",
-//     name: "Emily Davis",
-//     email: "emily@email.com",
-//     primaryRole: "Senior Product Manager",
-//     clients: [],
-//     contractSigned: true,
-//     applicationStatus: "accepted",
-//     avatarUrl: "/assets/avatars/04.png",
-//   },
-//   {
-//     id: "3",
-//     name: "Renata Enriquez",
-//     email: "renata@sparkandmint.com",
-//     primaryRole: "Product Designer",
-//     clients: [],
-//     contractSigned: true,
-//     applicationStatus: "accepted",
-//     avatarUrl: "/assets/avatars/01.png",
-//   },
-// ]
+import { Link } from "react-router-dom"
 
 const MemberTable = () => {
   const { data: memberData, isError } = useGetMembers()
+  const { data: clients, isPending: isLoadingClients } = useGetClients()
+  const { mutate: assignMemberToClient, isPending: IsLoadingAssignment } =
+    useAssignMemberToClient()
 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -126,16 +70,32 @@ const MemberTable = () => {
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
   const [members, setMembers] = useState<Models.Document[]>([])
-  const [clients] = useState<IClient[]>([])
 
-  const [memberEmail, setMemberEmail] = useState<string>("")
-  const [emailClient, setEmailClient] = useState<string>("")
-  const [showEmailDialog, setShowEmailDialog] = useState(false)
+  const handleAssignment = async (
+    clientId: string,
+    member: Models.Document
+  ) => {
+    if (clientId === "unassigned") {
+      const prevAssignedClientId = member.clients[0].$id
+      const memberArray = clients?.documents.find(
+        (client: Models.Document) => client.$id === prevAssignedClientId
+      )?.members
+      const newMemberArray = memberArray.filter(
+        (currentMember: Models.Document) => currentMember.$id !== member.$id
+      )
+      assignMemberToClient({
+        clientId: prevAssignedClientId,
+        memberArray: newMemberArray,
+      })
+      return
+    }
+    const memberArray = clients?.documents.find(
+      (client: Models.Document) => client.$id === clientId
+    )?.members
 
-  const handleAssignment = (value: string, email: string | undefined) => {
-    setMemberEmail(email || "")
-    setEmailClient(value)
-    setShowEmailDialog(true)
+    const newMemberArray = [...memberArray, member]
+
+    assignMemberToClient({ clientId, memberArray: newMemberArray })
   }
 
   useEffect(() => {
@@ -191,26 +151,32 @@ const MemberTable = () => {
       accessorKey: "assignedTo",
       header: "Assigned to",
       cell: ({ row }) => {
-        const email = members.find(
-          (member) => member.id === row.original.id
-        )?.email
-
+        const member = row.original
         return (
           <div className="w-[200px]">
             <Select
-              defaultValue={row.getValue("assignedTo") || ""}
-              onValueChange={(value) => handleAssignment(value, email)}
+              defaultValue={
+                member.clients &&
+                member.clients.length > 0 &&
+                member.clients[0].$id
+                  ? member.clients[0].$id
+                  : "unassigned"
+              }
+              onValueChange={(value) => handleAssignment(value, member)}
+              disabled={isLoadingClients || IsLoadingAssignment}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Unassigned" />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>
-                  {clients.map((client: IClient) => (
-                    <SelectItem key={client.name} value={client.name}>
-                      {client.name}
-                    </SelectItem>
-                  ))}
+                  <SelectItem value="unassigned">Unassigned</SelectItem>
+                  {clients &&
+                    clients?.documents.map((client: Models.Document) => (
+                      <SelectItem key={client.$id} value={client.$id}>
+                        {client.name}
+                      </SelectItem>
+                    ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -326,11 +292,13 @@ const MemberTable = () => {
 
   if (isError) {
     return (
-      <div className="flex items-center justify-center h-96 text-center border">
-        <p>
-          Error getting members. Check the JavaScript console for errors (option
-          + cmd + J) and Contact Kevin!
-        </p>
+      <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border">
+        <p>Error getting members.</p>
+        <Button asChild>
+          <Link target="_blank" to="https://status.appwrite.online/">
+            Check API status
+          </Link>
+        </Button>
       </div>
     )
   }
@@ -408,6 +376,7 @@ const MemberTable = () => {
             </TableBody>
           </Table>
         </div>
+
         <Pagination className="mt-12">
           <PaginationContent className="flex w-full justify-between">
             <PaginationItem>
@@ -432,39 +401,6 @@ const MemberTable = () => {
           </PaginationContent>
         </Pagination>
       </div>
-
-      <AlertDialog open={showEmailDialog} onOpenChange={setShowEmailDialog}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              This will send the following email
-            </AlertDialogTitle>
-            <div className="flex flex-col gap-6 py-4">
-              <div className="text-sm">
-                <span className="font-semibold">Recipient: </span>
-                {memberEmail}
-              </div>
-              <div className="text-sm">
-                <span className="font-semibold">Subject: </span>New work
-                opportunity: {emailClient}
-              </div>
-
-              <div className="text-sm leading-6">
-                <span className="font-semibold">Body: </span>Spark + Mint has a
-                new opportuniy at{" "}
-                <span className="font-semibold">{emailClient}</span> and we
-                think you're a great fit! Please let us know if you're
-                interested and we'll get you connected as soon as possible.
-              </div>
-            </div>
-          </AlertDialogHeader>
-          <AlertDialogContent></AlertDialogContent>
-          <AlertDialogFooter className="gap-4">
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction>Send email</AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   )
 }

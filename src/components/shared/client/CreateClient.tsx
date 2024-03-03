@@ -1,4 +1,3 @@
-import { Label } from "@radix-ui/react-label"
 import slugify from "slugify"
 import {
   Card,
@@ -9,62 +8,109 @@ import {
 } from "../../ui/card"
 import { Input } from "../../ui/input"
 import { Button } from "../../ui/button"
-import { useState } from "react"
 import { RotateCw } from "lucide-react"
+import { ClientValidation } from "@/lib/validation"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm } from "react-hook-form"
+import { z } from "zod"
+import { useCreateClient } from "@/lib/react-query/queries"
+import { toast } from "@/components/ui/use-toast"
+import {
+  Form,
+  FormDescription,
+  FormField,
+  FormItem,
+} from "@/components/ui/form"
+import { Label } from "@/components/ui/label"
 
 const CreateClient = () => {
-  const [clientName, setClientName] = useState("")
-  const [loading, setLoading] = useState(false)
+  const form = useForm<z.infer<typeof ClientValidation>>({
+    resolver: zodResolver(ClientValidation),
+    defaultValues: {
+      name: "",
+      slug: "",
+      file: undefined,
+    },
+    mode: "onChange",
+  })
 
-  const handleCreateClient = async () => {
-    setLoading(true)
-    const slug = slugify(clientName, { lower: true })
-    console.log(slug)
-    setLoading(false)
+  const fileRef = form.register("file")
+
+  const { mutateAsync: createClient, isPending } = useCreateClient()
+
+  const handleCreateClient = async (
+    client: z.infer<typeof ClientValidation>
+  ) => {
+    const newClient = await createClient({
+      name: client.name,
+      slug: slugify(client.name, { lower: true }),
+      file: client.file,
+    })
+
+    if (!newClient) {
+      toast({
+        title: "Could not create client. Please try again.",
+        variant: "destructive",
+      })
+    }
   }
 
   return (
     <Card className="flex flex-col justify-between h-full">
-      <CardHeader>
-        <CardTitle>Create new client</CardTitle>
-      </CardHeader>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(handleCreateClient)}>
+          <CardHeader>
+            <CardTitle>Create new client</CardTitle>
+          </CardHeader>
 
-      <CardContent>
-        <div className="grid gap-4 pt-6 pb-6">
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              onChange={(e) => setClientName(e.target.value)}
-              className="col-span-3"
+          <CardContent className="flex flex-col gap-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem className="grid grid-cols-4 items-center gap-4">
+                  <Label>Name</Label>
+                  <Input type="text" className="col-span-3" {...field} />
+                </FormItem>
+              )}
             />
-          </div>
-          <div className="grid grid-cols-4 items-center gap-4">
-            <Label htmlFor="name">Logo</Label>
-            <Input
-              id="logo"
-              type="file"
-              className="col-span-3 cursor-pointer"
-            />
-          </div>
-        </div>
-      </CardContent>
 
-      <CardFooter>
-        <Button
-          className="w-full"
-          disabled={loading}
-          onClick={handleCreateClient}
-        >
-          {loading ? (
-            <>
-              <RotateCw className="mr-1 h-4 w-4 animate-spin" />
-              Adding...
-            </>
-          ) : (
-            "Add client"
-          )}
-        </Button>
-      </CardFooter>
+            <FormField
+              control={form.control}
+              name="file"
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              render={({ field }) => (
+                <FormItem>
+                  <div className="grid grid-cols-4 items-center gap-4">
+                    <Label>Logo</Label>
+                    <Input
+                      type="file"
+                      className="col-span-3 cursor-pointer"
+                      {...fileRef}
+                    />
+                  </div>
+                  <FormDescription className="text-xs text-end">
+                    Allowed image types: .jpg, jpeg, .png
+                  </FormDescription>
+                </FormItem>
+              )}
+            />
+          </CardContent>
+
+          <CardFooter>
+            <Button className="w-full" disabled={isPending} type="submit">
+              {isPending ? (
+                <>
+                  <RotateCw className="mr-1 h-4 w-4 animate-spin" />
+                  Adding...
+                </>
+              ) : (
+                "Add client"
+              )}
+            </Button>
+          </CardFooter>
+        </form>
+      </Form>
     </Card>
   )
 }

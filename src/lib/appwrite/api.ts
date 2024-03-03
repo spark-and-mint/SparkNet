@@ -1,6 +1,6 @@
 import { ID, Query } from "appwrite"
-import { appwriteConfig, account, databases, storage } from "./config"
-import { INewMember } from "@/types"
+import { appwriteConfig, account, databases, storage, avatars } from "./config"
+import { IClient, IMember, INewClient, INewMember } from "@/types"
 
 export async function createMemberAccount(member: INewMember) {
   try {
@@ -46,7 +46,6 @@ export async function saveMemberToDB(member: {
   avatarUrl: URL
 }) {
   try {
-    console.log("saving member to db")
     const newMember = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.memberCollectionId,
@@ -135,6 +134,66 @@ export async function getClients() {
   return clients
 }
 
+export async function createClient(client: INewClient) {
+  try {
+    let logoUrl
+    let uploadedFile
+
+    if (client.file[0]) {
+      uploadedFile = await uploadFile(client.file[0])
+
+      if (!uploadedFile) throw Error
+
+      logoUrl = getFilePreview(uploadedFile.$id)
+      if (!logoUrl) {
+        await deleteFile(uploadedFile.$id)
+        throw Error
+      }
+    } else {
+      logoUrl = avatars.getInitials(client.name)
+    }
+
+    const newClient = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.clientCollectionId,
+      ID.unique(),
+      {
+        name: client.name,
+        slug: client.slug,
+        logoId: uploadedFile ? uploadedFile.$id : ID.unique(),
+        logoUrl,
+      }
+    )
+
+    if (!newClient && uploadedFile) {
+      await deleteFile(uploadedFile.$id)
+      throw Error
+    }
+
+    return newClient
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getClientById(clientId?: string) {
+  if (!clientId) throw Error
+
+  try {
+    const client = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.clientCollectionId,
+      clientId
+    )
+
+    if (!client) throw Error
+
+    return client
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export async function uploadFile(file: File) {
   try {
     const uploadedFile = await storage.createFile(
@@ -149,7 +208,6 @@ export async function uploadFile(file: File) {
   }
 }
 
-// ============================== GET FILE URL
 export function getFilePreview(fileId: string) {
   try {
     const fileUrl = storage.getFilePreview(
@@ -169,11 +227,108 @@ export function getFilePreview(fileId: string) {
   }
 }
 
-// ============================== DELETE FILE
+export async function updateClient(client: IClient) {
+  const hasFileToUpdate = client.file.length > 0
+
+  try {
+    let logo = {
+      logoUrl: client.logoUrl,
+      logoId: client.logoId,
+    }
+
+    if (hasFileToUpdate) {
+      // Upload new file to appwrite storage
+      const uploadedFile = await uploadFile(client.file[0])
+      if (!uploadedFile) throw Error
+
+      // Get new file url
+      const fileUrl = getFilePreview(uploadedFile.$id)
+      if (!fileUrl) {
+        await deleteFile(uploadedFile.$id)
+        throw Error
+      }
+
+      logo = { ...logo, logoUrl: fileUrl, logoId: uploadedFile.$id }
+    }
+
+    //  Update client
+    const updatedClient = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.clientCollectionId,
+      client.id,
+      {
+        imageUrl: logo.logoUrl,
+        logoId: logo.logoId,
+      }
+    )
+
+    // Failed to update
+    if (!updatedClient) {
+      // Delete new file that has been recently uploaded
+      if (hasFileToUpdate) {
+        await deleteFile(logo.logoId)
+      }
+
+      // If no new file uploaded, just throw error
+      throw Error
+    }
+
+    // Safely delete old file after successful update
+    if (hasFileToUpdate) {
+      await deleteFile(client.logoId)
+    }
+
+    return updatedClient
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function assignMemberToClient(
+  clientId: string,
+  memberArray: IMember[]
+) {
+  try {
+    const updatedClient = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.clientCollectionId,
+      clientId,
+      {
+        members: memberArray,
+      }
+    )
+
+    if (!updatedClient) throw Error
+
+    return updatedClient
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function deleteClient(clientId?: string, logoId?: string) {
+  if (!clientId || !logoId) return
+
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.clientCollectionId,
+      clientId
+    )
+
+    if (!statusCode) throw Error
+
+    await deleteFile(logoId)
+
+    return { status: "Ok" }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
 export async function deleteFile(fileId: string) {
   try {
     await storage.deleteFile(appwriteConfig.storageId, fileId)
-
     return { status: "ok" }
   } catch (error) {
     console.log(error)

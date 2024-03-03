@@ -5,7 +5,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { IMember } from "@/types"
 import { Button } from "../../ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar"
 import {
@@ -45,8 +44,8 @@ const ClientCard = ({ client }: { client: Models.Document }) => {
               <>
                 <h4 className="text-sm font-medium -mt-4">Assigned members</h4>
                 <div className="flex items-center space-x-4">
-                  {client.members.map((member: IMember) => (
-                    <TooltipProvider delayDuration={100} key={member.id}>
+                  {client.members.map((member: Models.Document) => (
+                    <TooltipProvider delayDuration={100} key={member.$id}>
                       <Tooltip>
                         <TooltipTrigger asChild>
                           <Avatar>
@@ -69,7 +68,7 @@ const ClientCard = ({ client }: { client: Models.Document }) => {
       </CardContent>
       <CardFooter>
         <Button asChild variant="outline" className="w-full">
-          <Link to={`/clients/${client.slug}`}>Client details</Link>
+          <Link to={`/clients/${client.$id}`}>Client details</Link>
         </Button>
       </CardFooter>
     </Card>

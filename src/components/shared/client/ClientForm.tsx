@@ -1,12 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useFieldArray, useForm } from "react-hook-form"
+import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -17,8 +15,10 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "@/components/ui/use-toast"
 import FileUploader from "@/components/shared/FileUploader"
 import { Separator } from "@/components/ui/separator"
-import { useState } from "react"
-import { IClient } from "@/types"
+import { useConfirm } from "@/components/shared/AlertDialogProvider"
+import { useClient } from "@/context/ClientContext"
+import { useNavigate } from "react-router-dom"
+import { deleteClient } from "@/lib/appwrite/api"
 
 const clientFormSchema = z.object({
   name: z
@@ -31,33 +31,22 @@ const clientFormSchema = z.object({
     }),
   description: z.string().max(160).min(4),
   logo: z.custom<File[]>(),
-  resources: z
-    .array(
-      z.object({
-        link: z.string(),
-      })
-    )
-    .optional(),
 })
 
 type ClientFormValues = z.infer<typeof clientFormSchema>
 
 const defaultValues: Partial<ClientFormValues> = {
   description: "",
-  resources: [{ link: "" }, { link: "" }],
 }
 
 const ClientForm = () => {
-  const [client] = useState<null | IClient>(null)
+  const navigate = useNavigate()
+  const client = useClient()
+  const confirm = useConfirm()
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientFormSchema),
     defaultValues,
     mode: "onChange",
-  })
-
-  const { fields, append } = useFieldArray({
-    name: "resources",
-    control: form.control,
   })
 
   function onSubmit(data: ClientFormValues) {
@@ -71,12 +60,31 @@ const ClientForm = () => {
     })
   }
 
+  const handleDelete = async (e: { preventDefault: () => void }) => {
+    e.preventDefault()
+    const deleteConfirmed = await confirm({
+      title: `Deleting ${client?.name}`,
+      body: "Are you sure you want to do that?",
+      cancelButton: "Cancel",
+      actionButton: "Delete",
+    })
+
+    if (!deleteConfirmed) return
+
+    try {
+      await deleteClient(client?.$id, client?.logoId)
+      navigate("/clients")
+    } catch (error) {
+      console.error({ error })
+    }
+  }
+
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Client profile</h3>
+        <h3 className="text-lg font-medium mb-2">Client settings</h3>
         <p className="text-sm text-muted-foreground">
-          Update this client's profile information
+          Update this client's profile settings
         </p>
       </div>
       <Separator />
@@ -131,40 +139,13 @@ const ClientForm = () => {
             )}
           />
 
-          <div>
-            {fields.map((field, index) => (
-              <FormField
-                control={form.control}
-                key={field.id}
-                name={`resources.${index}.link`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className={cn(index !== 0 && "sr-only")}>
-                      Resources
-                    </FormLabel>
-                    <FormDescription className={cn(index !== 0 && "sr-only")}>
-                      Add links, design assets, documents, and more.
-                    </FormDescription>
-                    <FormControl>
-                      <Input {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              onClick={() => append({ link: "" })}
-            >
-              Add resource
-            </Button>
-          </div>
           <div className="flex justify-end">
-            <Button type="submit">Update client</Button>
+            <div className="flex gap-6 pt-8">
+              <Button variant="secondary" onClick={handleDelete}>
+                Delete client
+              </Button>
+              <Button type="submit">Update client</Button>
+            </div>
           </div>
         </form>
       </Form>

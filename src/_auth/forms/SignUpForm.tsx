@@ -56,15 +56,12 @@ const SignUpForm = () => {
         return
       }
 
-      console.log(newMember)
-
       const session = await signInAccount({
         email: member.email,
         password: member.password,
       })
 
       if (!session) {
-        console.log("could not login")
         toast({
           title: "Something went wrong. Please try again.",
           variant: "destructive",
