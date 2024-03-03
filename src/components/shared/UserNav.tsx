@@ -1,6 +1,6 @@
 import { useMemberContext } from "@/context/AuthContext"
 import { useSignOutAccount } from "@/lib/react-query/queries"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
@@ -44,8 +44,10 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <Link to={`/profile-settings/${member.id}`}>Profile settings</Link>
+        <DropdownMenuItem
+          onClick={() => navigate(`/profile-settings/${member.id}`)}
+        >
+          Profile settings
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => signOut()}>Log out</DropdownMenuItem>

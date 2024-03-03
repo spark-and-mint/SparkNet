@@ -1,4 +1,3 @@
-import slugify from "slugify"
 import {
   Card,
   CardContent,
@@ -28,7 +27,6 @@ const CreateClient = () => {
     resolver: zodResolver(ClientValidation),
     defaultValues: {
       name: "",
-      slug: "",
       file: undefined,
     },
     mode: "onChange",
@@ -43,7 +41,6 @@ const CreateClient = () => {
   ) => {
     const newClient = await createClient({
       name: client.name,
-      slug: slugify(client.name, { lower: true }),
       file: client.file,
     })
 
@@ -78,7 +75,6 @@ const CreateClient = () => {
             <FormField
               control={form.control}
               name="file"
-              // { field } might be required
               render={() => (
                 <FormItem>
                   <div className="grid grid-cols-4 items-center gap-4">

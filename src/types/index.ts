@@ -22,27 +22,25 @@ export type IUpdateMember = {
   name: string
   email: string
   primaryRole: string
-  avatarId: string
   avatarUrl: URL | string
+  avatarId: string
   file: File[]
 }
 
 export type INewClient = {
   name: string
-  slug: string
   file: File[]
 }
 
 export type IClient = {
   id: string
   name: string
-  slug: string
   logoUrl: URL | string
   logoId: string
   file: File[]
-  description: string
-  members: IMember[]
-  resources: string[]
+  description?: string
+  members?: IMember[]
+  resources?: string[]
 }
 
 export type IResource = {

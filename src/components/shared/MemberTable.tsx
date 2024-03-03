@@ -59,7 +59,7 @@ import { Link } from "react-router-dom"
 const MemberTable = () => {
   const { data: memberData, isError } = useGetMembers()
   const { data: clients, isPending: isLoadingClients } = useGetClients()
-  const { mutate: assignMemberToClient, isPending: IsLoadingAssignment } =
+  const { mutate: assignMemberToClient, isPending: isLoadingAssignment } =
     useAssignMemberToClient()
 
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -163,7 +163,7 @@ const MemberTable = () => {
                   : "unassigned"
               }
               onValueChange={(value) => handleAssignment(value, member)}
-              disabled={isLoadingClients || IsLoadingAssignment}
+              disabled={isLoadingClients || isLoadingAssignment}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Unassigned" />

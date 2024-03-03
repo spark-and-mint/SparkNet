@@ -102,9 +102,12 @@ export const useUpdateClient = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (client: IClient) => updateClient(client),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CLIENTS],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CLIENT_BY_ID, data?.$id],
       })
     },
   })

@@ -24,7 +24,10 @@ const ClientCard = ({ client }: { client: Models.Document }) => {
           <div className="flex items-center justify-between">
             {client.name}
             {client.logoUrl ? (
-              <img src={client.logoUrl} className="w-12 h-12 rounded-full" />
+              <img
+                src={client.logoUrl}
+                className="w-14 h-14 ring-1 ring-gray-300 rounded-full"
+              />
             ) : (
               <Avatar>
                 <AvatarFallback>

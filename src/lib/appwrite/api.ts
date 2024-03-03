@@ -239,7 +239,6 @@ export async function createClient(client: INewClient) {
       ID.unique(),
       {
         name: client.name,
-        slug: client.slug,
         logoId: uploadedFile ? uploadedFile.$id : ID.unique(),
         logoUrl,
       }
@@ -337,7 +336,7 @@ export async function updateClient(client: IClient) {
       appwriteConfig.clientCollectionId,
       client.id,
       {
-        avatarUrl: logo.logoUrl,
+        logoUrl: logo.logoUrl,
         logoId: logo.logoId,
       }
     )
