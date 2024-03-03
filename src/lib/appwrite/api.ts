@@ -1,6 +1,12 @@
 import { ID, Query } from "appwrite"
 import { appwriteConfig, account, databases, storage, avatars } from "./config"
-import { IClient, IMember, INewClient, INewMember } from "@/types"
+import {
+  IClient,
+  IMember,
+  INewClient,
+  INewMember,
+  IUpdateMember,
+} from "@/types"
 
 export async function createMemberAccount(member: INewMember) {
   try {
@@ -121,6 +127,80 @@ export async function getMembers() {
   if (!members) throw Error
 
   return members
+}
+
+export async function getMemberById(memberId: string) {
+  try {
+    const member = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.memberCollectionId,
+      memberId
+    )
+
+    if (!member) throw Error
+
+    return member
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function updateMember(member: IUpdateMember) {
+  const hasFileToUpdate = member.file.length > 0
+  try {
+    let avatar = {
+      avatarUrl: member.avatarUrl,
+      avatarId: member.avatarId,
+    }
+
+    if (hasFileToUpdate) {
+      // Upload new file to appwrite storage
+      const uploadedFile = await uploadFile(member.file[0])
+      if (!uploadedFile) throw Error
+
+      // Get new file url
+      const fileUrl = getFilePreview(uploadedFile.$id)
+      if (!fileUrl) {
+        await deleteFile(uploadedFile.$id)
+        throw Error
+      }
+
+      avatar = { ...avatar, avatarUrl: fileUrl, avatarId: uploadedFile.$id }
+    }
+
+    //  Update member
+    const updatedMember = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.memberCollectionId,
+      member.memberId,
+      {
+        name: member.name,
+        email: member.email,
+        primaryRole: member.primaryRole,
+        avatarUrl: avatar.avatarUrl,
+        avatarId: avatar.avatarId,
+      }
+    )
+
+    // Failed to update
+    if (!updatedMember) {
+      // Delete new file that has been recently uploaded
+      if (hasFileToUpdate) {
+        await deleteFile(avatar.avatarId)
+      }
+      // If no new file uploaded, just throw error
+      throw Error
+    }
+
+    // Safely delete old file after successful update
+    if (member.avatarId && hasFileToUpdate) {
+      await deleteFile(member.avatarId)
+    }
+
+    return updatedMember
+  } catch (error) {
+    console.log(error)
+  }
 }
 
 export async function getClients() {
@@ -257,7 +337,7 @@ export async function updateClient(client: IClient) {
       appwriteConfig.clientCollectionId,
       client.id,
       {
-        imageUrl: logo.logoUrl,
+        avatarUrl: logo.logoUrl,
         logoId: logo.logoId,
       }
     )

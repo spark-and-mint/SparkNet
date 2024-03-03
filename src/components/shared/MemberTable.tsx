@@ -109,7 +109,7 @@ const MemberTable = () => {
       accessorKey: "name",
       header: "Member",
       cell: ({ row }) => {
-        const member = members.find((member) => member.id === row.original.id)
+        const member = members.find((member) => member.$id === row.original.$id)
         return (
           <div className="flex items-center gap-2 w-[200px]">
             <img

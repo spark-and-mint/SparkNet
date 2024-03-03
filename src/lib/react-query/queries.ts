@@ -1,4 +1,10 @@
-import { IClient, IMember, INewClient, INewMember } from "@/types"
+import {
+  IClient,
+  IMember,
+  INewClient,
+  INewMember,
+  IUpdateMember,
+} from "@/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   assignMemberToClient,
@@ -7,10 +13,12 @@ import {
   deleteClient,
   getClientById,
   getClients,
+  getMemberById,
   getMembers,
   signInAccount,
   signOutAccount,
   updateClient,
+  updateMember,
 } from "../appwrite/api"
 import { QUERY_KEYS } from "./queryKeys"
 
@@ -34,14 +42,37 @@ export const useCreateClient = () => {
 
 export const useSignInAccount = () => {
   return useMutation({
-    mutationFn: (user: { email: string; password: string }) =>
-      signInAccount(user),
+    mutationFn: (member: { email: string; password: string }) =>
+      signInAccount(member),
   })
 }
 
 export const useSignOutAccount = () => {
   return useMutation({
     mutationFn: signOutAccount,
+  })
+}
+
+export const useGetMemberById = (memberId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_MEMBER_BY_ID, memberId],
+    queryFn: () => getMemberById(memberId),
+    enabled: !!memberId,
+  })
+}
+
+export const useUpdateMember = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (member: IUpdateMember) => updateMember(member),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CURRENT_MEMBER],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_MEMBER_BY_ID, data?.$id],
+      })
+    },
   })
 }
 

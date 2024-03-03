@@ -8,6 +8,7 @@ import ClientLayout from "./_root/ClientLayout"
 import { Toaster } from "@/components/ui/toaster"
 import ClientForm from "@/components/shared/client/ClientForm"
 import ClientResources from "./components/shared/client/ClientResources"
+import ProfileSettings from "./_root/pages/ProfileSettings"
 import "./globals.css"
 
 const App = () => (
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/clients/:id/settings" element={<ClientForm />} />
           <Route path="/clients/:id/resources" element={<ClientResources />} />
         </Route>
+        <Route path="/profile-settings/:id" element={<ProfileSettings />} />
       </Route>
     </Routes>
 

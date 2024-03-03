@@ -7,9 +7,14 @@ import { CircleUser } from "lucide-react"
 type ProfileUploaderProps = {
   fieldChange: (files: File[]) => void
   mediaUrl: string
+  profileSettings?: boolean
 }
 
-const ProfileUploader = ({ fieldChange, mediaUrl }: ProfileUploaderProps) => {
+const ProfileUploader = ({
+  fieldChange,
+  mediaUrl,
+  profileSettings,
+}: ProfileUploaderProps) => {
   const [file, setFile] = useState<File[]>([])
   const [fileUrl, setFileUrl] = useState<string>(mediaUrl)
 
@@ -44,7 +49,9 @@ const ProfileUploader = ({ fieldChange, mediaUrl }: ProfileUploaderProps) => {
           <CircleUser strokeWidth={1.25} className="h-12 w-12" />
         )}
         <p className="text-xs font-medium text-center text-gray-900">
-          {fileUrl ? "Looking good!" : "Click or drag to upload photo"}
+          {fileUrl && !profileSettings
+            ? "Looking good!"
+            : "Click or drag to upload photo"}
         </p>
       </div>
     </div>

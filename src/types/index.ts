@@ -17,6 +17,16 @@ export type IMember = {
   applicationStatus: "form completed" | "1on1 done" | "accepted" | "rejected"
 }
 
+export type IUpdateMember = {
+  memberId: string
+  name: string
+  email: string
+  primaryRole: string
+  avatarId: string
+  avatarUrl: URL | string
+  file: File[]
+}
+
 export type INewClient = {
   name: string
   slug: string
