@@ -1,5 +1,5 @@
 import { useMemberContext } from "@/context/AuthContext"
-import { Link, Navigate, Outlet } from "react-router-dom"
+import { Navigate, Outlet } from "react-router-dom"
 
 const AuthLayout = () => {
   const { isAuthenticated } = useMemberContext()
@@ -12,15 +12,12 @@ const AuthLayout = () => {
         <>
           <section className="grid place-items-center h-screen w-full">
             <div className="w-64">
-              <Link
-                to="/"
-                className="block text-2xl font-semibold mb-8 text-center"
-              >
+              <h1 className="text-2xl font-semibold mb-8 text-center">
                 SparkNet{" "}
                 <span role="img" aria-label="sparkles">
                   ✨
                 </span>
-              </Link>
+              </h1>
               <Outlet />
             </div>
           </section>
