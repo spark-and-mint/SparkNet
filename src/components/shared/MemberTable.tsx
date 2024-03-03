@@ -292,7 +292,7 @@ const MemberTable = () => {
 
   if (isError) {
     return (
-      <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border">
+      <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-sm">
         <p>Error getting members.</p>
         <Button asChild>
           <Link target="_blank" to="https://status.appwrite.online/">

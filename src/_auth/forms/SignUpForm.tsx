@@ -120,20 +120,6 @@ const SignUpForm = () => {
 
         <FormField
           control={form.control}
-          name="file"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Avatar or profile picture</FormLabel>
-              <FormControl>
-                <ProfileUploader fieldChange={field.onChange} mediaUrl="" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
@@ -160,7 +146,21 @@ const SignUpForm = () => {
           )}
         />
 
-        <div>
+        <FormField
+          control={form.control}
+          name="file"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Avatar or profile picture</FormLabel>
+              <FormControl>
+                <ProfileUploader fieldChange={field.onChange} mediaUrl="" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="pt-1">
           <Button
             type="submit"
             className="mt-2 w-full"

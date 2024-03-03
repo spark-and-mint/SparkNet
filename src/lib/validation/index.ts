@@ -4,7 +4,7 @@ export const SignUpValidation = z.object({
   name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   primaryRole: z
     .string()
-    .min(2, { message: "Primary role must be at least 2 characters." }),
+    .min(2, { message: "Role must be at least 2 characters." }),
   file: z.custom<File[]>(),
   email: z.string().email(),
   password: z

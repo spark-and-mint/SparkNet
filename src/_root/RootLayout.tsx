@@ -1,9 +1,7 @@
 import { UserNav } from "@/components/shared/UserNav"
 import { Link, NavLink, Outlet } from "react-router-dom"
-// import { cn } from "@/lib/utils"
 
 const RootLayout = () => {
-  // const location = useLocation()
   const links = [
     {
       name: "Members",
