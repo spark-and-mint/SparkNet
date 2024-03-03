@@ -78,8 +78,8 @@ const CreateClient = () => {
             <FormField
               control={form.control}
               name="file"
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
-              render={({ field }) => (
+              // { field } might be required
+              render={() => (
                 <FormItem>
                   <div className="grid grid-cols-4 items-center gap-4">
                     <Label>Logo</Label>
