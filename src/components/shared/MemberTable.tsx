@@ -29,14 +29,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -48,20 +40,18 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
-import {
-  useAssignMemberToClient,
-  useGetClients,
-  useGetMembers,
-} from "@/lib/react-query/queries"
+import { useGetClients, useGetMembers } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
 import { Link } from "react-router-dom"
+import AssignMember from "./AssignMember"
 
 const MemberTable = () => {
-  const { data: memberData, isError } = useGetMembers()
-  const { data: clients, isPending: isLoadingClients } = useGetClients()
-  const { mutate: assignMemberToClient, isPending: isLoadingAssignment } =
-    useAssignMemberToClient()
-
+  const { data: memberData, isError: isErrorMembers } = useGetMembers()
+  const {
+    data: clients,
+    isPending: isLoadingClients,
+    isError: isErrorClients,
+  } = useGetClients()
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -70,33 +60,6 @@ const MemberTable = () => {
     React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
   const [members, setMembers] = useState<Models.Document[]>([])
-
-  const handleAssignment = async (
-    clientId: string,
-    member: Models.Document
-  ) => {
-    if (clientId === "unassigned") {
-      const prevAssignedClientId = member.clients[0].$id
-      const memberArray = clients?.documents.find(
-        (client: Models.Document) => client.$id === prevAssignedClientId
-      )?.members
-      const newMemberArray = memberArray.filter(
-        (currentMember: Models.Document) => currentMember.$id !== member.$id
-      )
-      assignMemberToClient({
-        clientId: prevAssignedClientId,
-        memberArray: newMemberArray,
-      })
-      return
-    }
-    const memberArray = clients?.documents.find(
-      (client: Models.Document) => client.$id === clientId
-    )?.members
-
-    const newMemberArray = [...memberArray, member]
-
-    assignMemberToClient({ clientId, memberArray: newMemberArray })
-  }
 
   useEffect(() => {
     if (memberData) {
@@ -109,7 +72,7 @@ const MemberTable = () => {
       accessorKey: "name",
       header: "Member",
       cell: ({ row }) => {
-        const member = members.find((member) => member.$id === row.original.$id)
+        const member = row.original
         return (
           <div className="flex items-center gap-2 w-[200px]">
             <img
@@ -118,8 +81,10 @@ const MemberTable = () => {
               className="w-10 h-10 rounded-full"
             />
             <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium leading-none">{member?.name}</p>
-              <p className="text-xs leading-none text-muted-foreground">
+              <p className="text-sm font-medium leading-none max-w-[180px] truncate">
+                {member?.name}
+              </p>
+              <p className="text-xs leading-none text-muted-foreground max-w-[180px] truncate">
                 {member?.email}
               </p>
             </div>
@@ -142,8 +107,10 @@ const MemberTable = () => {
         )
       },
       cell: ({ row }) => (
-        <div className="w-[180px] capitalize">
-          {row.getValue("primaryRole")}
+        <div className="w-[200px] capitalize">
+          <p className="max-w-[190px] truncate">
+            {row.getValue("primaryRole")}
+          </p>
         </div>
       ),
     },
@@ -151,35 +118,13 @@ const MemberTable = () => {
       accessorKey: "assignedTo",
       header: "Assigned to",
       cell: ({ row }) => {
-        const member = row.original
         return (
-          <div className="w-[200px]">
-            <Select
-              defaultValue={
-                member.clients &&
-                member.clients.length > 0 &&
-                member.clients[0].$id
-                  ? member.clients[0].$id
-                  : "unassigned"
-              }
-              onValueChange={(value) => handleAssignment(value, member)}
-              disabled={isLoadingClients || isLoadingAssignment}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Unassigned" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectItem value="unassigned">Unassigned</SelectItem>
-                  {clients &&
-                    clients?.documents.map((client: Models.Document) => (
-                      <SelectItem key={client.$id} value={client.$id}>
-                        {client.name}
-                      </SelectItem>
-                    ))}
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+          <div className="w-[220px]">
+            <AssignMember
+              member={row.original}
+              clients={clients}
+              isLoadingClients={isLoadingClients}
+            />
           </div>
         )
       },
@@ -244,7 +189,6 @@ const MemberTable = () => {
       id: "actions",
       enableHiding: false,
       cell: () => {
-        // const member = row.original
         return (
           <div className="flex justify-end mr-4">
             <DropdownMenu>
@@ -290,10 +234,10 @@ const MemberTable = () => {
     },
   })
 
-  if (isError) {
+  if (isErrorMembers || isErrorClients) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-sm">
-        <p>Error getting members.</p>
+        <p>Error getting data. Try refreshing your browser or:</p>
         <Button asChild>
           <Link target="_blank" to="https://status.appwrite.online/">
             Check API status
