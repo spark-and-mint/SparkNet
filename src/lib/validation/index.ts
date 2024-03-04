@@ -24,6 +24,7 @@ export const ClientValidation = z.object({
     .string()
     .min(2, { message: "Minimum 2 characters." })
     .max(2200, { message: "Maximum 2,200 caracters" }),
+  description: z.string(),
   file: z.custom<File[]>(),
 })
 

@@ -154,11 +154,9 @@ export async function updateMember(member: IUpdateMember) {
     }
 
     if (hasFileToUpdate) {
-      // Upload new file to appwrite storage
       const uploadedFile = await uploadFile(member.file[0])
       if (!uploadedFile) throw Error
 
-      // Get new file url
       const fileUrl = getFilePreview(uploadedFile.$id)
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id)
@@ -168,7 +166,6 @@ export async function updateMember(member: IUpdateMember) {
       avatar = { ...avatar, avatarUrl: fileUrl, avatarId: uploadedFile.$id }
     }
 
-    //  Update member
     const updatedMember = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.memberCollectionId,
@@ -182,17 +179,13 @@ export async function updateMember(member: IUpdateMember) {
       }
     )
 
-    // Failed to update
     if (!updatedMember) {
-      // Delete new file that has been recently uploaded
       if (hasFileToUpdate) {
         await deleteFile(avatar.avatarId)
       }
-      // If no new file uploaded, just throw error
       throw Error
     }
 
-    // Safely delete old file after successful update
     if (member.avatarId && hasFileToUpdate) {
       await deleteFile(member.avatarId)
     }
@@ -316,11 +309,9 @@ export async function updateClient(client: IClient) {
     }
 
     if (hasFileToUpdate) {
-      // Upload new file to appwrite storage
       const uploadedFile = await uploadFile(client.file[0])
       if (!uploadedFile) throw Error
 
-      // Get new file url
       const fileUrl = getFilePreview(uploadedFile.$id)
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id)
@@ -330,29 +321,26 @@ export async function updateClient(client: IClient) {
       logo = { ...logo, logoUrl: fileUrl, logoId: uploadedFile.$id }
     }
 
-    //  Update client
     const updatedClient = await databases.updateDocument(
       appwriteConfig.databaseId,
       appwriteConfig.clientCollectionId,
       client.id,
       {
+        name: client.name,
+        description: client.description,
         logoUrl: logo.logoUrl,
         logoId: logo.logoId,
       }
     )
 
-    // Failed to update
     if (!updatedClient) {
-      // Delete new file that has been recently uploaded
       if (hasFileToUpdate) {
         await deleteFile(logo.logoId)
       }
 
-      // If no new file uploaded, just throw error
       throw Error
     }
 
-    // Safely delete old file after successful update
     if (hasFileToUpdate) {
       await deleteFile(client.logoId)
     }
