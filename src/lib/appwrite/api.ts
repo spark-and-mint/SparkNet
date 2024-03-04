@@ -328,6 +328,7 @@ export async function updateClient(client: IClient) {
       {
         name: client.name,
         description: client.description,
+        resources: client.resources,
         logoUrl: logo.logoUrl,
         logoId: logo.logoId,
       }

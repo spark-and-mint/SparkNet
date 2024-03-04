@@ -10,7 +10,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { useToast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import { Input, Button } from "@/components/ui"
 import { ProfileUploader, Loader } from "@/components/shared"
 import { ProfileValidation } from "@/lib/validation"
@@ -19,7 +19,6 @@ import { useGetMemberById, useUpdateMember } from "@/lib/react-query/queries"
 import { RotateCw } from "lucide-react"
 
 const ProfileSettings = () => {
-  const { toast } = useToast()
   const navigate = useNavigate()
   const { id } = useParams()
   const { member, setMember } = useMemberContext()
@@ -51,9 +50,9 @@ const ProfileSettings = () => {
     })
 
     if (!updatedMember) {
-      toast({
-        title: `Update member failed. Please try again.`,
-      })
+      toast.error("Failed to update profile. Please try again.")
+    } else {
+      toast.success("Profile updated successfully!")
     }
 
     setMember({

@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import FileUploader from "@/components/shared/FileUploader"
 import { Separator } from "@/components/ui/separator"
 import { useConfirm } from "@/components/shared/AlertDialogProvider"
@@ -21,14 +21,12 @@ import { useNavigate } from "react-router-dom"
 import { deleteClient } from "@/lib/appwrite/api"
 import { ClientValidation } from "@/lib/validation"
 import { useUpdateClient } from "@/lib/react-query/queries"
-import { useState } from "react"
 import { RotateCw } from "lucide-react"
 
 const ClientForm = () => {
   const navigate = useNavigate()
   const client = useClient()
   const confirm = useConfirm()
-  const [updateSuccess, setUpdateSuccess] = useState(false)
   const form = useForm<z.infer<typeof ClientValidation>>({
     resolver: zodResolver(ClientValidation),
     defaultValues: {
@@ -50,16 +48,10 @@ const ClientForm = () => {
     })
 
     if (!updatedClient) {
-      toast({
-        title: "Failed to update client. Please try again.",
-      })
+      toast.error("Failed to update client. Please try again")
+    } else {
+      toast.success("Client updated successfully!")
     }
-
-    setUpdateSuccess(true)
-
-    setTimeout(() => {
-      setUpdateSuccess(false)
-    }, 2000)
   }
 
   const handleDelete = async (e: { preventDefault: () => void }) => {
@@ -75,6 +67,7 @@ const ClientForm = () => {
 
     try {
       await deleteClient(client?.$id, client?.logoId)
+      toast("Client deleted successfully.")
       navigate("/clients")
     } catch (error) {
       console.error({ error })
@@ -157,8 +150,6 @@ const ClientForm = () => {
                     <RotateCw className="h-4 w-4 animate-spin" />
                     Updating...
                   </div>
-                ) : updateSuccess ? (
-                  "Update successful!"
                 ) : (
                   "Update client"
                 )}

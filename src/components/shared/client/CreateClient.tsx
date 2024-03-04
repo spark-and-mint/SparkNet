@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { useCreateClient } from "@/lib/react-query/queries"
-import { toast } from "@/components/ui/use-toast"
+import { toast } from "sonner"
 import {
   Form,
   FormDescription,
@@ -45,10 +45,9 @@ const CreateClient = () => {
     })
 
     if (!newClient) {
-      toast({
-        title: "Could not create client. Please try again.",
-        variant: "destructive",
-      })
+      toast.error("Could not create client. Please try again.")
+    } else {
+      toast.success("Client created successfully.")
     }
   }
 

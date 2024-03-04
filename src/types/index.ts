@@ -40,12 +40,11 @@ export type IClient = {
   file: File[]
   description?: string
   members?: IMember[]
-  resources?: string[]
+  resources?: IResource[]
 }
 
 export type IResource = {
-  name: string
-  file: File[]
+  title: string
   link: string
-  icon: "design" | "document"
+  type: "design" | "document" | "other"
 }

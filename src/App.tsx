@@ -5,7 +5,7 @@ import SignUpForm from "./_auth/forms/SignUpForm"
 import AuthLayout from "./_auth/AuthLayout"
 import RootLayout from "./_root/RootLayout"
 import ClientLayout from "./_root/ClientLayout"
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster } from "sonner"
 import ClientForm from "@/components/shared/client/ClientForm"
 import ClientResources from "./components/shared/client/ClientResources"
 import ProfileSettings from "./_root/pages/ProfileSettings"
@@ -31,7 +31,7 @@ const App = () => (
       </Route>
     </Routes>
 
-    <Toaster />
+    <Toaster position="top-right" expand={true} richColors />
   </main>
 )
 
