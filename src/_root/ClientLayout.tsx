@@ -34,7 +34,7 @@ const ClientLayout = () => {
 
   return (
     <div className="mx-32">
-      <Card className="flex flex-col gap-12 py-12 px-12">
+      <Card className="flex flex-col gap-8 py-8 px-8">
         <div className="relative flex items-center justify-between">
           <Button asChild variant="ghost">
             <Link to="/clients">
@@ -45,7 +45,7 @@ const ClientLayout = () => {
           <div className="absolute left-1/2 -translate-x-1/2 text-2xl font-semibold ">
             {client?.name}
           </div>
-          <div className="mr-4">
+          <div className="mr-2">
             {client?.logoUrl ? (
               <img src={client.logoUrl} className="w-14 h-14 rounded-full" />
             ) : (

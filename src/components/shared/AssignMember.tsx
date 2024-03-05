@@ -28,7 +28,7 @@ const AssignMember = ({
         (client) => client.$id === clientId
       )?.members
       const memberArray = clientMembers ? [...clientMembers, member] : [member]
-      assignMemberToClient({ clientId, memberArray })
+      assignMemberToClient({ clientId, memberArray, addMember: true })
     } else if (action.action === "remove-value") {
       const clientId = action.removedValue.value
       const clientMembers = clients?.documents.find(
@@ -39,7 +39,7 @@ const AssignMember = ({
             (clientMember: Models.Document) => clientMember.$id !== member.$id
           )
         : []
-      assignMemberToClient({ clientId, memberArray })
+      assignMemberToClient({ clientId, memberArray, addMember: false })
     }
   }
 

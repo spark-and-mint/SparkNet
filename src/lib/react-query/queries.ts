@@ -122,6 +122,7 @@ export const useAssignMemberToClient = () => {
     }: {
       clientId: string
       memberArray: IMember[]
+      addMember: boolean
     }) => assignMemberToClient(clientId, memberArray),
     onSuccess: () => {
       queryClient.invalidateQueries({

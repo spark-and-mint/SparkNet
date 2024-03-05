@@ -236,8 +236,8 @@ const MemberTable = () => {
 
   if (isErrorMembers || isErrorClients) {
     return (
-      <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-sm">
-        <p>Error getting data. Try refreshing your browser or:</p>
+      <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-lg">
+        <p>Error getting data.</p>
         <Button asChild>
           <Link target="_blank" to="https://status.appwrite.online/">
             Check API status
@@ -308,7 +308,7 @@ const MemberTable = () => {
                 <TableRow>
                   <TableCell
                     colSpan={columns.length}
-                    className="h-48 text-center"
+                    className="h-56 text-center"
                   >
                     <div className="flex items-center justify-center gap-1">
                       <RotateCw className="mr-2 h-4 w-4 animate-spin" />

@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui"
 import { Separator } from "@/components/ui/separator"
-import { RotateCw } from "lucide-react"
+import { PlusIcon, RotateCw, Trash2 } from "lucide-react"
 import { IResource } from "@/types"
 
 const clientResourcesSchema = z.object({
@@ -50,13 +50,12 @@ const ClientResources = () => {
           link: resource.link ? resource.link : "",
           type: resource.type ? resource.type : "document",
         })) || []),
-        { title: "", link: "", type: "document" },
       ],
     },
     mode: "onChange",
   })
 
-  const { fields, append } = useFieldArray({
+  const { fields, append, remove } = useFieldArray({
     name: "resources",
     control: form.control,
   })
@@ -91,74 +90,94 @@ const ClientResources = () => {
       </div>
       <Separator />
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="pt-3">
-          <div className="space-y-6">
-            {fields.map((field, index) => (
-              <div key={field.id} className="grid grid-cols-3 gap-3">
-                <FormField
-                  control={form.control}
-                  name={`resources.${index}.title`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Title</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`resources.${index}.link`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Link</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`resources.${index}.type`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Type</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={field.onChange}
-                          defaultValue={field.value}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Select type of resource" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="design">Design asset</SelectItem>
-                            <SelectItem value="document">Document</SelectItem>
-                            <SelectItem value="other">Other</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            ))}
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="mt-2"
-              onClick={() => append({ title: "", link: "", type: "document" })}
-            >
-              Add resource
-            </Button>
+        <form onSubmit={form.handleSubmit(handleSubmit)}>
+          <div className="space-y-7 divide-y">
+            {fields.length === 0 ? (
+              <p className="py-3 text-sm">No resources added yet.</p>
+            ) : (
+              <>
+                {fields.map((field, index) => (
+                  <div key={field.id} className="flex items-end gap-3 pt-5">
+                    <FormField
+                      control={form.control}
+                      name={`resources.${index}.title`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>Title</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`resources.${index}.link`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>Link</FormLabel>
+                          <FormControl>
+                            <Input {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name={`resources.${index}.type`}
+                      render={({ field }) => (
+                        <FormItem className="w-full">
+                          <FormLabel>Type</FormLabel>
+                          <FormControl>
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={field.value}
+                            >
+                              <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select type of resource" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="design">
+                                  Design asset
+                                </SelectItem>
+                                <SelectItem value="document">
+                                  Document
+                                </SelectItem>
+                                <SelectItem value="other">Other</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => remove(index)}
+                      className="w-24"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
-          <div className="flex justify-end">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="mt-8"
+            onClick={() => append({ title: "", link: "", type: "document" })}
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            Add resource
+          </Button>
+          <div className="flex justify-end mt-8">
             <Button type="submit" disabled={isLoadingUpdate}>
               {isLoadingUpdate ? (
                 <div className="flex items-center gap-2">
