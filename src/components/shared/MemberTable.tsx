@@ -2,6 +2,8 @@ import * as React from "react"
 import {
   ColumnDef,
   ColumnFiltersState,
+  FilterFn,
+  SortingFn,
   SortingState,
   VisibilityState,
   flexRender,
@@ -9,16 +11,9 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  sortingFns,
   useReactTable,
 } from "@tanstack/react-table"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
 import { ArrowUpDown, MoreHorizontal, PlusIcon, RotateCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -45,8 +40,55 @@ import { Models } from "appwrite"
 import { Link } from "react-router-dom"
 import AssignMember from "./AssignMember"
 
+import {
+  RankingInfo,
+  rankItem,
+  compareItems,
+} from "@tanstack/match-sorter-utils"
+
+declare module "@tanstack/table-core" {
+  interface FilterFns {
+    fuzzy: FilterFn<unknown>
+  }
+  interface FilterMeta {
+    itemRank: RankingInfo
+  }
+}
+
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  // Store the itemRank info
+  addMeta({
+    itemRank,
+  })
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed
+}
+
+const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
+  let dir = 0
+
+  // Only sort by rank if the column has ranking information
+  if (rowA.columnFiltersMeta[columnId]) {
+    dir = compareItems(
+      rowA.columnFiltersMeta[columnId]?.itemRank,
+      rowB.columnFiltersMeta[columnId]?.itemRank
+    )
+  }
+
+  // Provide an alphanumeric fallback for when the item ranks are equal
+  return dir === 0 ? sortingFns.alphanumeric(rowA, rowB, columnId) : dir
+}
+
 const MemberTable = () => {
-  const { data: memberData, isError: isErrorMembers } = useGetMembers()
+  const {
+    data: memberData,
+    isError: isErrorMembers,
+    isPending: isLoadingMembers,
+  } = useGetMembers()
   const {
     data: clients,
     isPending: isLoadingClients,
@@ -56,9 +98,9 @@ const MemberTable = () => {
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
   )
+  const [globalFilter, setGlobalFilter] = React.useState("")
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
-  const [rowSelection, setRowSelection] = React.useState({})
   const [members, setMembers] = useState<Models.Document[]>([])
 
   useEffect(() => {
@@ -67,73 +109,38 @@ const MemberTable = () => {
     }
   }, [memberData])
 
-  const columns: ColumnDef<Models.Document>[] = [
-    {
-      accessorKey: "name",
-      header: "Member",
-      cell: ({ row }) => {
-        const member = row.original
-        return (
-          <div className="flex items-center gap-2 w-[200px]">
-            <img
-              src={member?.avatarUrl}
-              alt="avatar"
-              className="w-10 h-10 rounded-full"
-            />
-            <div className="flex flex-col gap-2">
-              <p className="text-sm font-medium leading-none max-w-[180px] truncate">
-                {member?.name}
-              </p>
-              <p className="text-xs leading-none text-muted-foreground max-w-[180px] truncate">
-                {member?.email}
-              </p>
+  const columns = React.useMemo<ColumnDef<Models.Document>[]>(
+    () => [
+      {
+        accessorKey: "name",
+        header: "Member",
+        cell: ({ row }) => {
+          const member = row.original
+          return (
+            <div className="flex items-center gap-2 w-[200px]">
+              <img
+                src={member?.avatarUrl}
+                alt="avatar"
+                className="w-10 h-10 rounded-full"
+              />
+              <div className="flex flex-col gap-2">
+                <p className="text-sm font-medium leading-none max-w-[180px] truncate">
+                  {member?.name}
+                </p>
+                <p className="text-xs leading-none text-muted-foreground max-w-[180px] truncate">
+                  {member?.email}
+                </p>
+              </div>
             </div>
-          </div>
-        )
+          )
+        },
+        filterFn: "fuzzy",
+        sortingFn: fuzzySort,
       },
-    },
-    {
-      accessorKey: "primaryRole",
-      header: ({ column }) => {
-        return (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-            className="-ml-4"
-          >
-            Primary role
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        )
-      },
-      cell: ({ row }) => (
-        <div className="w-[200px] capitalize">
-          <p className="max-w-[190px] truncate">
-            {row.getValue("primaryRole")}
-          </p>
-        </div>
-      ),
-    },
-    {
-      accessorKey: "assignedTo",
-      header: "Assigned to",
-      cell: ({ row }) => {
-        return (
-          <div className="w-[220px]">
-            <AssignMember
-              member={row.original}
-              clients={clients}
-              isLoadingClients={isLoadingClients}
-            />
-          </div>
-        )
-      },
-    },
-    {
-      accessorKey: "applicationStatus",
-      header: ({ column }) => {
-        return (
-          <div className="flex justify-center">
+      {
+        accessorKey: "primaryRole",
+        header: ({ column }) => {
+          return (
             <Button
               variant="ghost"
               onClick={() =>
@@ -141,96 +148,143 @@ const MemberTable = () => {
               }
               className="-ml-4"
             >
-              Application status
+              Primary role
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
+          )
+        },
+        cell: ({ row }) => (
+          <div className="w-[200px] capitalize">
+            <p className="max-w-[190px] truncate">
+              {row.getValue("primaryRole")}
+            </p>
           </div>
-        )
+        ),
+        filterFn: "fuzzy",
+        sortingFn: fuzzySort,
       },
-      cell: ({ row }) => {
-        const status: string = row.getValue("applicationStatus")
-        const bgColor: { [key: string]: string } = {
-          "form completed": "#feb919",
-          "1on1 done": "#2cccff",
-          accepted: "#23c05c",
-          rejected: "#e02523",
-        }
+      {
+        accessorKey: "assignedTo",
+        header: "Assigned to",
+        cell: ({ row }) => {
+          return (
+            <div className="w-[220px]">
+              <AssignMember
+                member={row.original}
+                clients={clients}
+                isLoadingClients={isLoadingClients}
+              />
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: "applicationStatus",
+        header: ({ column }) => {
+          return (
+            <div className="flex justify-center">
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
+                className="-ml-4"
+              >
+                Application status
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          )
+        },
+        cell: ({ row }) => {
+          const status: string = row.getValue("applicationStatus")
+          const bgColor: { [key: string]: string } = {
+            "form completed": "#feb919",
+            "1on1 done": "#2cccff",
+            accepted: "#23c05c",
+            rejected: "#e02523",
+          }
 
-        return (
-          <div className="flex justify-center">
-            <Badge
-              className="capitalize"
-              style={{ background: bgColor[status] }}
-            >
-              {status}
-            </Badge>
-          </div>
-        )
+          return (
+            <div className="flex justify-center">
+              <Badge
+                className="capitalize"
+                style={{ background: bgColor[status] }}
+              >
+                {status}
+              </Badge>
+            </div>
+          )
+        },
       },
-    },
-    {
-      accessorKey: "contractSigned",
-      header: "Contract signed",
-      cell: ({ row }) => {
-        const signed = row.getValue("contractSigned")
-        return (
-          <div className="flex justify-center">
-            <Badge
-              variant={signed ? "default" : "secondary"}
-              style={{ background: signed ? "#23c05c" : "#f4f4f5" }}
-            >
-              {!signed ? "Not signed" : "Signed"}
-            </Badge>
-          </div>
-        )
+      {
+        accessorKey: "contractSigned",
+        header: () => <div className="text-center">Contract signed</div>,
+        cell: ({ row }) => {
+          const signed = row.getValue("contractSigned")
+          return (
+            <div className="flex justify-center">
+              <Badge
+                variant={signed ? "default" : "secondary"}
+                style={{ background: signed ? "#23c05c" : "#f4f4f5" }}
+              >
+                {!signed ? "Not signed" : "Signed"}
+              </Badge>
+            </div>
+          )
+        },
       },
-    },
-    {
-      id: "actions",
-      enableHiding: false,
-      cell: () => {
-        return (
-          <div className="flex justify-end mr-4">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-6 w-6" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuItem>Edit member</DropdownMenuItem>
-                <DropdownMenuItem>View application</DropdownMenuItem>
-                <DropdownMenuItem>View contract</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>
-                  <span className="font-medium text-[#e40808]">Delete</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        )
+      {
+        id: "actions",
+        enableHiding: false,
+        cell: () => {
+          return (
+            <div className="flex justify-end mr-4">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-6 w-6" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuItem>Edit member</DropdownMenuItem>
+                  <DropdownMenuItem>View application</DropdownMenuItem>
+                  <DropdownMenuItem>View contract</DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem>
+                    <span className="font-medium text-[#e40808]">Delete</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )
+        },
       },
-    },
-  ]
+    ],
+    [clients, isLoadingClients]
+  )
 
   const table = useReactTable({
     data: members,
     columns,
-    onSortingChange: setSorting,
+    filterFns: {
+      fuzzy: fuzzyFilter,
+    },
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
-    onRowSelectionChange: setRowSelection,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
-      rowSelection,
+      globalFilter,
     },
   })
 
@@ -251,15 +305,10 @@ const MemberTable = () => {
     <>
       <div className="w-full mt-4">
         <div className="flex items-center justify-between pb-4">
-          <Input
-            placeholder="Search roles..."
-            value={
-              (table.getColumn("primaryRole")?.getFilterValue() as string) ?? ""
-            }
-            onChange={(event) =>
-              table.getColumn("primaryRole")?.setFilterValue(event.target.value)
-            }
-            className="max-w-sm"
+          <DebouncedInput
+            value={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
+            placeholder="Search..."
           />
           <Button variant="outline" size="sm">
             <PlusIcon className="mr-2 h-4 w-4" />
@@ -311,8 +360,14 @@ const MemberTable = () => {
                     className="h-56 text-center"
                   >
                     <div className="flex items-center justify-center gap-1">
-                      <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                      Loading members...
+                      {isLoadingMembers ? (
+                        <>
+                          <RotateCw className="mr-2 h-4 w-4 animate-spin" />
+                          Loading members...
+                        </>
+                      ) : (
+                        "No members found."
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -320,32 +375,42 @@ const MemberTable = () => {
             </TableBody>
           </Table>
         </div>
-
-        <Pagination className="mt-12">
-          <PaginationContent className="flex w-full justify-between">
-            <PaginationItem>
-              <PaginationPrevious href="#" />
-            </PaginationItem>
-            <div className="flex gap-2">
-              <PaginationItem>
-                <PaginationLink href="#" isActive>
-                  1
-                </PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">2</PaginationLink>
-              </PaginationItem>
-              <PaginationItem>
-                <PaginationLink href="#">3</PaginationLink>
-              </PaginationItem>
-            </div>
-            <PaginationItem>
-              <PaginationNext href="#" />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
       </div>
     </>
+  )
+}
+
+function DebouncedInput({
+  value: initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}: {
+  value: string | number
+  onChange: (value: string | number) => void
+  debounce?: number
+} & Omit<React.InputHTMLAttributes<HTMLInputElement>, "onChange">) {
+  const [value, setValue] = React.useState(initialValue)
+
+  React.useEffect(() => {
+    setValue(initialValue)
+  }, [initialValue])
+
+  React.useEffect(() => {
+    const timeout = setTimeout(() => {
+      onChange(value)
+    }, debounce)
+
+    return () => clearTimeout(timeout)
+  }, [value])
+
+  return (
+    <Input
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      className="max-w-sm"
+    />
   )
 }
 

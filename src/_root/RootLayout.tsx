@@ -14,7 +14,7 @@ const RootLayout = () => {
   ]
 
   return (
-    <div className="pt-12 px-32 pb-24 w-full">
+    <div className="w-full max-w-screen-xl mx-auto pt-12 pb-24 px-4">
       <div className="relative flex items-center justify-between pb-12">
         <div className="flex items-center gap-3">
           <Link to="/">
