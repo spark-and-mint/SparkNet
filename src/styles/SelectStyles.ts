@@ -11,12 +11,33 @@ const SelectStyles = {
     outlineOffset: state.isFocused ? "2px" : "none",
   }),
   menuPortal: (base: any) => ({ ...base, zIndex: 9999 }),
-  // valueContainer: (base: any, state: any) => {
-  //   return {
-  //     ...base,
-  //     // flexWrap: "nowrap",
-  //   }
-  // },
+  multiValue: (base: any) => {
+    return {
+      ...base,
+      color: "white",
+      backgroundColor: "#282828",
+      borderRadius: "16px",
+      fontWeight: "600",
+    }
+  },
+  multiValueLabel: (base: any) => {
+    return {
+      ...base,
+      paddingLeft: "12px",
+      color: "white",
+    }
+  },
+  multiValueRemove: (base: any) => {
+    return {
+      ...base,
+      borderRadius: "0 16px 16px 0",
+    }
+  },
+  valueContainer: (base: any) => {
+    return {
+      ...base,
+    }
+  },
 }
 
 export default SelectStyles
