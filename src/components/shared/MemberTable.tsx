@@ -14,7 +14,7 @@ import {
   sortingFns,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal, PlusIcon, RotateCw } from "lucide-react"
+import { ArrowUpDown, MoreHorizontal, RotateCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -310,10 +310,7 @@ const MemberTable = () => {
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search..."
           />
-          <Button variant="outline" size="sm">
-            <PlusIcon className="mr-2 h-4 w-4" />
-            Add member
-          </Button>
+          {members.length > 0 && <p>Total members: {members.length}</p>}
         </div>
 
         <div className="rounded-md border">
