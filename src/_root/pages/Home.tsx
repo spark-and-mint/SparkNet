@@ -1,5 +1,5 @@
-import MemberTable from "@/components/shared/MemberTable"
+import ApplicantTable from "@/components/shared/ApplicantTable"
 
-const Home = () => <MemberTable />
+const Home = () => <ApplicantTable />
 
 export default Home

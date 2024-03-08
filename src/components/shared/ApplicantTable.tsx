@@ -36,7 +36,6 @@ import { useEffect, useState } from "react"
 import { useGetClients, useGetMembers } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
 import { Link } from "react-router-dom"
-import AssignMember from "./AssignMember"
 
 import { RankingInfo } from "@tanstack/match-sorter-utils"
 import { fuzzyFilter, fuzzySort } from "@/lib/utils"
@@ -50,7 +49,7 @@ declare module "@tanstack/table-core" {
   }
 }
 
-const MemberTable = () => {
+const ApplicantTable = () => {
   const {
     data: memberData,
     isError: isErrorMembers,
@@ -72,11 +71,10 @@ const MemberTable = () => {
 
   useEffect(() => {
     if (memberData) {
-      console.log(memberData)
-      const signedMembers = memberData.documents.filter(
-        (member) => member.contractSigned === true
+      const acceptedMembers = memberData.documents.filter(
+        (member) => !member.contractSigned
       )
-      setMembers(signedMembers)
+      setMembers(acceptedMembers)
     }
   }, [memberData])
 
@@ -133,21 +131,6 @@ const MemberTable = () => {
         ),
         filterFn: "fuzzy",
         sortingFn: fuzzySort,
-      },
-      {
-        accessorKey: "assignedTo",
-        header: "Assigned to",
-        cell: ({ row }) => {
-          return (
-            <div className="w-[220px]">
-              <AssignMember
-                member={row.original}
-                clients={clients}
-                isLoadingClients={isLoadingClients}
-              />
-            </div>
-          )
-        },
       },
       {
         accessorKey: "applicationStatus",
@@ -382,4 +365,4 @@ function DebouncedInput({
   )
 }
 
-export default MemberTable
+export default ApplicantTable

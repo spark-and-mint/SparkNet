@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom"
 import SignInForm from "./_auth/forms/SignInForm"
-import { Home, Clients, Client } from "./_root/pages"
+import { Home, Members, Clients, Client } from "./_root/pages"
 import SignUpForm from "./_auth/forms/SignUpForm"
 import AuthLayout from "./_auth/AuthLayout"
 import RootLayout from "./_root/RootLayout"
@@ -21,6 +21,7 @@ const App = () => (
 
       <Route element={<RootLayout />}>
         <Route index element={<Home />} />
+        <Route path="/members" element={<Members />} />
         <Route path="/clients" element={<Clients />} />
         <Route element={<ClientLayout />}>
           <Route path="/clients/:id" element={<Client />} />
