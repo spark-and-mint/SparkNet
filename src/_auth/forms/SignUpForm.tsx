@@ -30,7 +30,8 @@ const SignUpForm = () => {
   const form = useForm<z.infer<typeof SignUpValidation>>({
     resolver: zodResolver(SignUpValidation),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       primaryRole: "",
       file: [],
       email: "",
@@ -48,7 +49,6 @@ const SignUpForm = () => {
       const newMember = await createMemberAccount(member)
 
       if (!newMember) {
-        console.log("could not create member account")
         toast({
           title: "Sign up failed. Please try again.",
           variant: "destructive",
@@ -92,10 +92,24 @@ const SignUpForm = () => {
       <form onSubmit={form.handleSubmit(handleSignUp)} className="space-y-4">
         <FormField
           control={form.control}
-          name="name"
+          name="firstName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>First name</FormLabel>
+              <FormControl>
+                <Input type="text" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Last name</FormLabel>
               <FormControl>
                 <Input type="text" {...field} />
               </FormControl>

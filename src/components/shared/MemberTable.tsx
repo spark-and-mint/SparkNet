@@ -96,7 +96,7 @@ const MemberTable = () => {
               />
               <div className="flex flex-col gap-2">
                 <p className="text-sm font-medium leading-none max-w-[180px] truncate">
-                  {member?.name}
+                  {member?.firstName} {member?.lasttName}
                 </p>
                 <p className="text-xs leading-none text-muted-foreground max-w-[180px] truncate">
                   {member?.email}

@@ -56,7 +56,9 @@ const ClientCard = ({ client }: { client: Models.Document }) => {
                           </Avatar>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{member.name}</p>
+                          <p>
+                            {member.firstName} {member.lastName}
+                          </p>
                         </TooltipContent>
                       </Tooltip>
                     </TooltipProvider>

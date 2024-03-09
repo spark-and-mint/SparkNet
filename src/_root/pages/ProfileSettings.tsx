@@ -27,7 +27,8 @@ const ProfileSettings = () => {
     resolver: zodResolver(ProfileValidation),
     defaultValues: {
       file: [],
-      name: currentMember?.name,
+      firstName: currentMember?.firstName,
+      lastName: currentMember?.lastName,
       primaryRole: currentMember?.primaryRole,
       email: currentMember?.email,
     },
@@ -41,7 +42,8 @@ const ProfileSettings = () => {
   const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
     const updatedMember = await updateMember({
       memberId: currentMember.$id,
-      name: value.name,
+      firstName: value.firstName,
+      lastName: value.lastName,
       email: value.email,
       primaryRole: value.primaryRole,
       file: value.file,
@@ -57,7 +59,8 @@ const ProfileSettings = () => {
 
     setMember({
       ...member,
-      name: updatedMember?.name,
+      firstName: updatedMember?.firstName,
+      lastName: updatedMember?.lastName,
       email: updatedMember?.email,
       primaryRole: updatedMember?.primaryRole,
       avatarUrl: updatedMember?.avatarUrl,
@@ -74,11 +77,26 @@ const ProfileSettings = () => {
         <form onSubmit={form.handleSubmit(handleUpdate)} className="space-y-4">
           <FormField
             control={form.control}
-            name="name"
-            defaultValue={currentMember.name}
+            name="firstName"
+            defaultValue={currentMember.firstName}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Name</FormLabel>
+                <FormLabel>First name</FormLabel>
+                <FormControl>
+                  <Input type="text" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="lastName"
+            defaultValue={currentMember.lastName}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Last name</FormLabel>
                 <FormControl>
                   <Input type="text" {...field} />
                 </FormControl>

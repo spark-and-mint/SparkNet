@@ -1,7 +1,12 @@
 import { z } from "zod"
 
 export const SignUpValidation = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  firstName: z
+    .string()
+    .min(2, { message: "First name must be at least 2 characters." }),
+  lastName: z
+    .string()
+    .min(2, { message: "Last name must be at least 2 characters." }),
   primaryRole: z
     .string()
     .min(2, { message: "Role must be at least 2 characters." }),
@@ -29,7 +34,12 @@ export const ClientValidation = z.object({
 })
 
 export const ProfileValidation = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
+  firstName: z
+    .string()
+    .min(2, { message: "First name must be at least 2 characters." }),
+  lastName: z
+    .string()
+    .min(2, { message: "Last name must be at least 2 characters." }),
   primaryRole: z
     .string()
     .min(2, { message: "Role must be at least 2 characters." }),

@@ -1,7 +1,8 @@
 export type INewMember = {
   email: string
   password: string
-  name: string
+  firstName: string
+  lastName: string
   file: File[]
   primaryRole: string
 }
@@ -9,7 +10,8 @@ export type INewMember = {
 export type IMember = {
   id: string
   email: string
-  name: string
+  firstName: string
+  lastName: string
   avatarUrl: string
   primaryRole: string
   clients: IClient[]
@@ -19,7 +21,8 @@ export type IMember = {
 
 export type IUpdateMember = {
   memberId: string
-  name: string
+  firstName: string
+  lastName: string
   email: string
   primaryRole: string
   avatarUrl: URL | string

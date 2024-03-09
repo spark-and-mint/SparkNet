@@ -23,8 +23,7 @@ export async function createMemberAccount(member: INewMember) {
     const newAccount = await account.create(
       ID.unique(),
       member.email,
-      member.password,
-      member.name
+      member.password
     )
 
     if (!newAccount) throw Error
@@ -32,7 +31,8 @@ export async function createMemberAccount(member: INewMember) {
     const newMember = await saveMemberToDB({
       accountId: newAccount.$id,
       email: newAccount.email,
-      name: newAccount.name,
+      firstName: member.firstName,
+      lastName: member.lastName,
       primaryRole: member.primaryRole,
       avatarUrl: fileUrl,
     })
@@ -47,7 +47,8 @@ export async function createMemberAccount(member: INewMember) {
 export async function saveMemberToDB(member: {
   accountId: string
   email: string
-  name: string
+  firstName: string
+  lastName: string
   primaryRole: string
   avatarUrl: URL
 }) {
@@ -171,7 +172,8 @@ export async function updateMember(member: IUpdateMember) {
       appwriteConfig.memberCollectionId,
       member.memberId,
       {
-        name: member.name,
+        firstName: member.firstName,
+        lastName: member.lastName,
         email: member.email,
         primaryRole: member.primaryRole,
         avatarUrl: avatar.avatarUrl,
