@@ -2,6 +2,7 @@ import * as z from "zod"
 import { useForm } from "react-hook-form"
 import { Link, useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { toast } from "sonner"
 import {
   Form,
   FormControl,
@@ -12,7 +13,6 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
 import {
   useCreateMemberAccount,
   useSignInAccount,
@@ -23,7 +23,6 @@ import ProfileUploader from "@/components/shared/ProfileUploader"
 import { RotateCw } from "lucide-react"
 
 const SignUpForm = () => {
-  const { toast } = useToast()
   const navigate = useNavigate()
   const { checkAuthMember, isLoading: isMemberLoading } = useMemberContext()
 
@@ -49,10 +48,7 @@ const SignUpForm = () => {
       const newMember = await createMemberAccount(member)
 
       if (!newMember) {
-        toast({
-          title: "Sign up failed. Please try again.",
-          variant: "destructive",
-        })
+        toast.error("Sign up failed. Please try again.")
         return
       }
 
@@ -62,10 +58,7 @@ const SignUpForm = () => {
       })
 
       if (!session) {
-        toast({
-          title: "Something went wrong. Please try again.",
-          variant: "destructive",
-        })
+        toast.error("Something went wrong. Please try again.")
         navigate("/sign-in")
         return
       }
@@ -76,10 +69,7 @@ const SignUpForm = () => {
         form.reset()
         navigate("/")
       } else {
-        toast({
-          title: "Login failed. Please try again.",
-          variant: "destructive",
-        })
+        toast.error("Login failed. Please try again.")
         return
       }
     } catch (error) {

@@ -59,6 +59,7 @@ const MemberTable = () => {
   const {
     data: clients,
     isPending: isLoadingClients,
+    refetch: refetchClients,
     isError: isErrorClients,
   } = useGetClients()
   const [sorting, setSorting] = React.useState<SortingState>([])
@@ -72,7 +73,6 @@ const MemberTable = () => {
 
   useEffect(() => {
     if (memberData) {
-      console.log(memberData)
       const signedMembers = memberData.documents.filter(
         (member) => member.contractSigned === true
       )
@@ -96,7 +96,7 @@ const MemberTable = () => {
               />
               <div className="flex flex-col gap-2">
                 <p className="text-sm font-medium leading-none max-w-[180px] truncate">
-                  {member?.firstName} {member?.lasttName}
+                  {member?.firstName} {member?.lastName}
                 </p>
                 <p className="text-xs leading-none text-muted-foreground max-w-[180px] truncate">
                   {member?.email}
@@ -143,6 +143,7 @@ const MemberTable = () => {
               <AssignMember
                 member={row.original}
                 clients={clients}
+                refetchClients={refetchClients}
                 isLoadingClients={isLoadingClients}
               />
             </div>

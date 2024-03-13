@@ -2,20 +2,26 @@ import { Models } from "appwrite"
 import Select, { ActionMeta } from "react-select"
 import SelectStyles from "@/styles/SelectStyles"
 import { useAssignMemberToClient } from "@/lib/react-query/queries"
+import { useEffect } from "react"
 
 interface AssignMemberProps {
   member: Models.Document
   clients: Models.DocumentList<Models.Document> | undefined
   isLoadingClients: boolean
+  refetchClients: () => void
 }
 
 const AssignMember = ({
   member,
   clients,
   isLoadingClients,
+  refetchClients,
 }: AssignMemberProps) => {
-  const { mutate: assignMemberToClient, isPending: isLoadingAssignment } =
-    useAssignMemberToClient()
+  const {
+    mutate: assignMemberToClient,
+    isPending: isLoadingAssignment,
+    isSuccess: assignSuccess,
+  } = useAssignMemberToClient()
 
   const handleAssignment = async (
     action: ActionMeta<{ value: string; label: string }>,
@@ -54,6 +60,12 @@ const AssignMember = ({
   }))
 
   const isLoading = isLoadingClients || isLoadingAssignment
+
+  useEffect(() => {
+    if (assignSuccess) {
+      refetchClients()
+    }
+  }, [assignSuccess, refetchClients])
 
   return (
     <Select

@@ -1494,7 +1494,7 @@ anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-appwrite@^13.0.2:
+appwrite@13:
   version "13.0.2"
   resolved "https://registry.yarnpkg.com/appwrite/-/appwrite-13.0.2.tgz#225f38225a012bb7dc2a70ea777fae363f9188fa"
   integrity sha512-ISkUXO8pojDWGx5XqknCwwikgAQye4Ni4FL+Ns8Hg42rXeyehLlmvHGjFOmpS+odT6nsWYUaXzVjV4SZuDorog==

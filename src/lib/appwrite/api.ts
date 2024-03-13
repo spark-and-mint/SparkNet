@@ -288,9 +288,7 @@ export function getFilePreview(fileId: string) {
       appwriteConfig.storageId,
       fileId,
       2000,
-      2000,
-      "top",
-      100
+      2000
     )
 
     if (!fileUrl) throw Error
