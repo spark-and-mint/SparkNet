@@ -1,19 +1,31 @@
 import { useNavigate } from "react-router-dom"
 import { createContext, useContext, useEffect, useState } from "react"
-
 import { IMember } from "@/types"
 import { getCurrentMember } from "@/lib/appwrite/api"
 
 export const INITIAL_MEMBER: IMember = {
   id: "",
+  emailVerification: false,
+  email: "",
+  name: "",
   firstName: "",
   lastName: "",
-  email: "",
-  avatarUrl: "",
+  website: "",
+  linkedin: "",
   primaryRole: "",
+  seniority: "",
+  workStatus: "",
+  rate: "",
+  skills: [],
+  domains: [],
+  timezone: "",
+  availability: "",
+  status: null,
+  meeting: "",
+  avatarUrl: "",
+  avatarId: "",
   clients: [],
   contractSigned: false,
-  applicationStatus: "form completed",
 }
 
 const INITIAL_STATE = {
@@ -51,14 +63,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (currentAccount) {
         setMember({
           id: currentAccount.$id,
+          emailVerification: currentAccount.emailVerification,
+          email: currentAccount.email,
+          name: currentAccount.name,
           firstName: currentAccount.firstName,
           lastName: currentAccount.lastName,
-          email: currentAccount.email,
+          website: currentAccount.website,
+          linkedin: currentAccount.linkedin,
           primaryRole: currentAccount.primaryRole,
+          seniority: currentAccount.seniority,
+          workStatus: currentAccount.workStatus,
+          rate: currentAccount.rate,
+          skills: currentAccount.skills,
+          domains: currentAccount.domains,
+          timezone: currentAccount.timezone,
+          availability: currentAccount.availability,
+          status: currentAccount.status,
+          meeting: currentAccount.meeting,
           avatarUrl: currentAccount.avatarUrl,
+          avatarId: currentAccount.avatarId,
           clients: currentAccount.clients,
           contractSigned: currentAccount.contractSigned,
-          applicationStatus: currentAccount.applicationStatus,
         })
         setIsAuthenticated(true)
         return true

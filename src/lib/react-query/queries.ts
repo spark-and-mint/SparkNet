@@ -1,15 +1,8 @@
-import {
-  IClient,
-  IMember,
-  INewClient,
-  INewMember,
-  IUpdateMember,
-} from "@/types"
+import { IClient, IMember, INewClient, IUpdateMember } from "@/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   assignMemberToClient,
   createClient,
-  createMemberAccount,
   deleteClient,
   getClientById,
   getClients,
@@ -21,12 +14,6 @@ import {
   updateMember,
 } from "../appwrite/api"
 import { QUERY_KEYS } from "./queryKeys"
-
-export const useCreateMemberAccount = () => {
-  return useMutation({
-    mutationFn: (member: INewMember) => createMemberAccount(member),
-  })
-}
 
 export const useCreateClient = () => {
   const queryClient = useQueryClient()

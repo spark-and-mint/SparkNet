@@ -1,7 +1,7 @@
 import * as z from "zod"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Link, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import {
   Form,
@@ -100,13 +100,6 @@ const SignInForm = () => {
             )}
           </Button>
         </div>
-
-        <p className="text-sm text-center">
-          Don&apos;t have an account?
-          <Link to="/sign-up" className="font-semibold ml-1">
-            Sign up
-          </Link>
-        </p>
       </form>
     </Form>
   )
