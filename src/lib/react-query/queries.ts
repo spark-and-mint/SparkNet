@@ -100,7 +100,10 @@ export const useCreateProject = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CLIENT_PROJECTS, data?.client.$id],
-      })
+      }),
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_CLIENT_BY_ID, data?.client.$id],
+        })
     },
   })
 }
