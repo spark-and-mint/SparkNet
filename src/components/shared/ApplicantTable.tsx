@@ -55,7 +55,11 @@ const ApplicantTable = () => {
     isError: isErrorMembers,
     isPending: isLoadingMembers,
   } = useGetMembers()
-  const { data: profileData, isPending: isLoadingProfiles } = useGetProfiles()
+  const {
+    data: profileData,
+    isError: isErrorProfiles,
+    isPending: isLoadingProfiles,
+  } = useGetProfiles()
 
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -309,7 +313,7 @@ const ApplicantTable = () => {
     },
   })
 
-  if (isErrorMembers) {
+  if (isErrorMembers || isErrorProfiles) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-lg">
         <p>Error getting data.</p>
@@ -331,7 +335,7 @@ const ApplicantTable = () => {
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search..."
           />
-          {members.length > 0 && <p>Total members: {members.length}</p>}
+          {members.length > 0 && <p>Total applicants: {members.length}</p>}
         </div>
 
         <div className="rounded-md border">

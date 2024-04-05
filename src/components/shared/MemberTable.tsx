@@ -33,10 +33,9 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
-import { useGetClients, useGetMembers } from "@/lib/react-query/queries"
+import { useGetMembers, useGetProfiles } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
 import { Link } from "react-router-dom"
-import AssignMember from "./AssignMember"
 
 import { RankingInfo } from "@tanstack/match-sorter-utils"
 import { fuzzyFilter, fuzzySort } from "@/lib/utils"
@@ -57,11 +56,10 @@ const MemberTable = () => {
     isPending: isLoadingMembers,
   } = useGetMembers()
   const {
-    data: clients,
-    isPending: isLoadingClients,
-    refetch: refetchClients,
-    isError: isErrorClients,
-  } = useGetClients()
+    data: profileData,
+    isError: isErrorProfiles,
+    isPending: isLoadingProfiles,
+  } = useGetProfiles()
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -72,13 +70,23 @@ const MemberTable = () => {
   const [members, setMembers] = useState<Models.Document[]>([])
 
   useEffect(() => {
-    if (memberData) {
-      const signedMembers = memberData.documents.filter(
-        (member) => member.contractSigned === true
+    if (memberData && profileData) {
+      const acceptedMembers = memberData.documents.filter(
+        (member) => member.status === "accepted"
       )
-      setMembers(signedMembers)
+      const mergedMemberData = acceptedMembers.map((member) => {
+        const profile = profileData.documents.find(
+          (profile) => profile.memberId === member.accountId
+        )
+        return {
+          ...member,
+          ...profile,
+        }
+      })
+
+      setMembers(mergedMemberData)
     }
-  }, [memberData])
+  }, [memberData, profileData])
 
   const columns = React.useMemo<ColumnDef<Models.Document>[]>(
     () => [
@@ -88,17 +96,17 @@ const MemberTable = () => {
         cell: ({ row }) => {
           const member = row.original
           return (
-            <div className="flex items-center gap-2 w-[200px]">
+            <div className="flex items-center gap-2">
               <img
                 src={member?.avatarUrl}
                 alt="avatar"
                 className="w-10 h-10 rounded-full"
               />
               <div className="flex flex-col gap-2">
-                <p className="text-sm font-medium leading-none max-w-[180px] truncate">
+                <p className="text-sm font-medium leading-none max-w-[10rem] truncate">
                   {member?.firstName} {member?.lastName}
                 </p>
-                <p className="text-xs leading-none text-muted-foreground max-w-[180px] truncate">
+                <p className="text-xs leading-none text-muted-foreground max-w-[10rem] truncate">
                   {member?.email}
                 </p>
               </div>
@@ -124,72 +132,105 @@ const MemberTable = () => {
             </Button>
           )
         },
-        cell: ({ row }) => (
-          <div className="w-[200px] capitalize">
-            <p className="max-w-[190px] truncate">{row.getValue("roles")}</p>
-          </div>
-        ),
+        cell: ({ row }) => {
+          return (
+            <div className="max-w-[12rem]">
+              <p className="text-xs truncate text-wrap">
+                {(row.getValue("roles") as string[]).join(", ")}
+              </p>
+            </div>
+          )
+        },
         filterFn: "fuzzy",
         sortingFn: fuzzySort,
       },
       {
-        accessorKey: "assignedTo",
-        header: "Assigned to",
-        cell: ({ row }) => {
-          return (
-            <div className="w-[220px]">
-              <AssignMember
-                member={row.original}
-                clients={clients}
-                refetchClients={refetchClients}
-                isLoadingClients={isLoadingClients}
-              />
-            </div>
-          )
-        },
-      },
-      {
-        accessorKey: "applicationStatus",
+        accessorKey: "skills",
         header: ({ column }) => {
           return (
-            <div className="flex justify-center">
-              <Button
-                variant="ghost"
-                onClick={() =>
-                  column.toggleSorting(column.getIsSorted() === "asc")
-                }
-                className="-ml-4"
-              >
-                Application status
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="-ml-4"
+            >
+              Skills
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
           )
         },
         cell: ({ row }) => {
-          const status: string = row.getValue("applicationStatus")
-          const bgColor: { [key: string]: string } = {
-            "form completed": "#feb919",
-            "1on1 done": "#2cccff",
-            accepted: "#23c05c",
-            rejected: "#e02523",
-          }
-
           return (
-            <div className="flex justify-center">
-              <Badge
-                className="capitalize"
-                style={{ background: bgColor[status] }}
-              >
-                {status}
-              </Badge>
+            <div className="max-w-[12rem]">
+              <p className="text-xs text-wrap">
+                {(row.getValue("skills") as string[]).join(", ")}
+              </p>
             </div>
           )
         },
+        filterFn: "fuzzy",
+        sortingFn: fuzzySort,
+      },
+      {
+        accessorKey: "domains",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="-ml-4"
+            >
+              Industries
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          return (
+            <div className="max-w-[12rem]">
+              <p className="text-xs text-wrap">
+                {(row.getValue("domains") as string[]).join(", ")}
+              </p>
+            </div>
+          )
+        },
+        filterFn: "fuzzy",
+        sortingFn: fuzzySort,
+      },
+      {
+        accessorKey: "seniority",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="-ml-4"
+            >
+              Seniority
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          return (
+            <div className="capitalize text-sm">
+              {row.getValue("seniority")}
+            </div>
+          )
+        },
+        filterFn: "fuzzy",
+        sortingFn: fuzzySort,
       },
       {
         accessorKey: "contractSigned",
-        header: () => <div className="text-center">Contract signed</div>,
+        header: () => (
+          <div className="text-center text-nowrap">Contract signed</div>
+        ),
         cell: ({ row }) => {
           const signed = row.getValue("contractSigned")
           return (
@@ -233,7 +274,7 @@ const MemberTable = () => {
         },
       },
     ],
-    [clients, isLoadingClients]
+    []
   )
 
   const table = useReactTable({
@@ -258,7 +299,7 @@ const MemberTable = () => {
     },
   })
 
-  if (isErrorMembers || isErrorClients) {
+  if (isErrorMembers || isErrorProfiles) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-lg">
         <p>Error getting data.</p>
@@ -327,7 +368,7 @@ const MemberTable = () => {
                     className="h-56 text-center"
                   >
                     <div className="flex items-center justify-center gap-1">
-                      {isLoadingMembers ? (
+                      {isLoadingMembers || isLoadingProfiles ? (
                         <>
                           <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                           Loading members...
