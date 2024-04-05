@@ -6,13 +6,7 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from "../../ui/button"
-import { Avatar, AvatarFallback, AvatarImage } from "../../ui/avatar"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../../ui/tooltip"
+import { Avatar, AvatarFallback } from "../../ui/avatar"
 import { Link } from "react-router-dom"
 import { Models } from "appwrite"
 
@@ -43,37 +37,20 @@ const ClientCard = ({ client }: { client: Models.Document }) => {
       <CardContent>
         <div className="space-y-4">
           <div className="flex flex-col gap-4">
-            {client.members && client.members.length > 0 ? (
-              <>
-                <h4 className="text-sm font-medium -mt-4">Assigned members</h4>
-                <div className="flex items-center space-x-4">
-                  {client.members.map((member: Models.Document) => (
-                    <TooltipProvider delayDuration={100} key={member.$id}>
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <Avatar>
-                            <AvatarImage src={member.avatarUrl} />
-                          </Avatar>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>
-                            {member.firstName} {member.lastName}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
-                    </TooltipProvider>
-                  ))}
-                </div>
-              </>
+            {client.projects && client.projects.length > 0 ? (
+              <p className="text-center py-8">
+                {client.projects.length} active{" "}
+                {client.projects.length > 1 ? "projects" : "project"}
+              </p>
             ) : (
-              <p className="text-center py-8">No members assigned</p>
+              <p className="text-center py-8">No active projects</p>
             )}
           </div>
         </div>
       </CardContent>
       <CardFooter>
         <Button asChild variant="outline" className="w-full">
-          <Link to={`/clients/${client.$id}`}>Client details</Link>
+          <Link to={`/clients/${client.$id}`}>Client space</Link>
         </Button>
       </CardFooter>
     </Card>

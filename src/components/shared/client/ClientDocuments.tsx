@@ -13,14 +13,7 @@ import { useClient } from "@/context/ClientContext"
 import { useUpdateClient } from "@/lib/react-query/queries"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import {
-  Input,
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui"
+import { Input } from "@/components/ui"
 import { Separator } from "@/components/ui/separator"
 import { PlusIcon, RotateCw, Trash2 } from "lucide-react"
 import { IResource } from "@/types"
@@ -39,7 +32,7 @@ const clientResourcesSchema = z.object({
 
 type ClientResourcesValues = z.infer<typeof clientResourcesSchema>
 
-const ClientResources = () => {
+const ClientDocuments = () => {
   const client = useClient()
   const form = useForm<ClientResourcesValues>({
     resolver: zodResolver(clientResourcesSchema),
@@ -83,9 +76,9 @@ const ClientResources = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium mb-2">Client resources</h3>
+        <h3 className="text-lg font-medium mb-2">Legal documents</h3>
         <p className="text-sm text-muted-foreground">
-          Add design assets, documents, and more.
+          Add the master service agreement (MSA), contracts, proposals, etc.
         </p>
       </div>
       <Separator />
@@ -124,35 +117,6 @@ const ClientResources = () => {
                         </FormItem>
                       )}
                     />
-                    <FormField
-                      control={form.control}
-                      name={`resources.${index}.type`}
-                      render={({ field }) => (
-                        <FormItem className="w-full">
-                          <FormLabel>Type</FormLabel>
-                          <FormControl>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <SelectTrigger className="w-full">
-                                <SelectValue placeholder="Select type of resource" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="design">
-                                  Design asset
-                                </SelectItem>
-                                <SelectItem value="document">
-                                  Document
-                                </SelectItem>
-                                <SelectItem value="other">Other</SelectItem>
-                              </SelectContent>
-                            </Select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                     <Button
                       type="button"
                       variant="ghost"
@@ -175,7 +139,7 @@ const ClientResources = () => {
             onClick={() => append({ title: "", link: "", type: "document" })}
           >
             <PlusIcon className="mr-2 h-4 w-4" />
-            Add resource
+            Add document
           </Button>
           <div className="flex justify-end mt-8">
             <Button type="submit" disabled={isLoadingUpdate}>
@@ -185,7 +149,7 @@ const ClientResources = () => {
                   Updating...
                 </div>
               ) : (
-                "Update client"
+                "Update documents"
               )}
             </Button>
           </div>
@@ -195,4 +159,4 @@ const ClientResources = () => {
   )
 }
 
-export default ClientResources
+export default ClientDocuments

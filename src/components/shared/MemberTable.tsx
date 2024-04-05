@@ -109,7 +109,7 @@ const MemberTable = () => {
         sortingFn: fuzzySort,
       },
       {
-        accessorKey: "primaryRole",
+        accessorKey: "roles",
         header: ({ column }) => {
           return (
             <Button
@@ -119,16 +119,14 @@ const MemberTable = () => {
               }
               className="-ml-4"
             >
-              Primary role
+              Roles
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           )
         },
         cell: ({ row }) => (
           <div className="w-[200px] capitalize">
-            <p className="max-w-[190px] truncate">
-              {row.getValue("primaryRole")}
-            </p>
+            <p className="max-w-[190px] truncate">{row.getValue("roles")}</p>
           </div>
         ),
         filterFn: "fuzzy",

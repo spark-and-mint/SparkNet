@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
-import { useGetClients, useGetMembers } from "@/lib/react-query/queries"
+import { useGetMembers, useGetProfiles } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
 import { Link } from "react-router-dom"
 
@@ -55,11 +55,8 @@ const ApplicantTable = () => {
     isError: isErrorMembers,
     isPending: isLoadingMembers,
   } = useGetMembers()
-  const {
-    data: clients,
-    isPending: isLoadingClients,
-    isError: isErrorClients,
-  } = useGetClients()
+  const { data: profileData, isPending: isLoadingProfiles } = useGetProfiles()
+
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -70,13 +67,23 @@ const ApplicantTable = () => {
   const [members, setMembers] = useState<Models.Document[]>([])
 
   useEffect(() => {
-    if (memberData) {
+    if (memberData && profileData) {
       const acceptedMembers = memberData.documents.filter(
-        (member) => !member.contractSigned
+        (member) => member.status !== "accepted"
       )
-      setMembers(acceptedMembers)
+      const mergedMemberData = acceptedMembers.map((member) => {
+        const profile = profileData.documents.find(
+          (profile) => profile.memberId === member.accountId
+        )
+        return {
+          ...member,
+          ...profile,
+        }
+      })
+
+      setMembers(mergedMemberData)
     }
-  }, [memberData])
+  }, [memberData, profileData])
 
   const columns = React.useMemo<ColumnDef<Models.Document>[]>(
     () => [
@@ -86,7 +93,7 @@ const ApplicantTable = () => {
         cell: ({ row }) => {
           const member = row.original
           return (
-            <div className="flex items-center gap-2 w-[200px]">
+            <div className="flex items-center gap-2 w-[180px]">
               <img
                 src={member?.avatarUrl}
                 alt="avatar"
@@ -107,7 +114,7 @@ const ApplicantTable = () => {
         sortingFn: fuzzySort,
       },
       {
-        accessorKey: "primaryRole",
+        accessorKey: "roles",
         header: ({ column }) => {
           return (
             <Button
@@ -117,23 +124,101 @@ const ApplicantTable = () => {
               }
               className="-ml-4"
             >
-              Primary role
+              Roles
               <ArrowUpDown className="ml-2 h-4 w-4" />
             </Button>
           )
         },
-        cell: ({ row }) => (
-          <div className="w-[200px] capitalize">
-            <p className="max-w-[190px] truncate">
-              {row.getValue("primaryRole")}
+        cell: ({ row }) => {
+          return (
+            <p className="text-xs truncate text-wrap">
+              {(row.getValue("roles") as string[]).join(", ")}
             </p>
-          </div>
-        ),
+          )
+        },
         filterFn: "fuzzy",
         sortingFn: fuzzySort,
       },
       {
-        accessorKey: "applicationStatus",
+        accessorKey: "skills",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="-ml-4"
+            >
+              Skills
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          return (
+            <p className="text-xs text-wrap">
+              {(row.getValue("skills") as string[]).join(", ")}
+            </p>
+          )
+        },
+        filterFn: "fuzzy",
+        sortingFn: fuzzySort,
+      },
+      {
+        accessorKey: "domains",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="-ml-4"
+            >
+              Industries
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          return (
+            <p className="text-xs text-wrap">
+              {(row.getValue("domains") as string[]).join(", ")}
+            </p>
+          )
+        },
+        filterFn: "fuzzy",
+        sortingFn: fuzzySort,
+      },
+      {
+        accessorKey: "seniority",
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="-ml-4"
+            >
+              Seniority
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
+        cell: ({ row }) => {
+          return (
+            <div className="capitalize text-sm">
+              {row.getValue("seniority")}
+            </div>
+          )
+        },
+        filterFn: "fuzzy",
+        sortingFn: fuzzySort,
+      },
+      {
+        accessorKey: "status",
         header: ({ column }) => {
           return (
             <div className="flex justify-center">
@@ -144,14 +229,14 @@ const ApplicantTable = () => {
                 }
                 className="-ml-4"
               >
-                Application status
+                Status
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </div>
           )
         },
         cell: ({ row }) => {
-          const status: string = row.getValue("applicationStatus")
+          const status: string = row.getValue("status")
           const bgColor: { [key: string]: string } = {
             "form completed": "#feb919",
             "1on1 done": "#2cccff",
@@ -161,28 +246,10 @@ const ApplicantTable = () => {
 
           return (
             <div className="flex justify-center">
-              <Badge
-                className="capitalize"
-                style={{ background: bgColor[status] }}
-              >
-                {status}
-              </Badge>
-            </div>
-          )
-        },
-      },
-      {
-        accessorKey: "contractSigned",
-        header: () => <div className="text-center">Contract signed</div>,
-        cell: ({ row }) => {
-          const signed = row.getValue("contractSigned")
-          return (
-            <div className="flex justify-center">
-              <Badge
-                variant={signed ? "default" : "secondary"}
-                style={{ background: signed ? "#23c05c" : "#f4f4f5" }}
-              >
-                {!signed ? "Not signed" : "Signed"}
+              <Badge style={{ background: bgColor[status] }}>
+                <span className="first-letter:uppercase text-nowrap">
+                  {status}
+                </span>
               </Badge>
             </div>
           )
@@ -217,7 +284,7 @@ const ApplicantTable = () => {
         },
       },
     ],
-    [clients, isLoadingClients]
+    []
   )
 
   const table = useReactTable({
@@ -242,7 +309,7 @@ const ApplicantTable = () => {
     },
   })
 
-  if (isErrorMembers || isErrorClients) {
+  if (isErrorMembers) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-lg">
         <p>Error getting data.</p>
@@ -311,7 +378,7 @@ const ApplicantTable = () => {
                     className="h-56 text-center"
                   >
                     <div className="flex items-center justify-center gap-1">
-                      {isLoadingMembers ? (
+                      {isLoadingMembers || isLoadingProfiles ? (
                         <>
                           <RotateCw className="mr-2 h-4 w-4 animate-spin" />
                           Loading members...

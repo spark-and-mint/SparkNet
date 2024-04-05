@@ -25,7 +25,9 @@ const ClientPage = () => {
   return (
     <>
       {isPending && !clients ? (
-        <Loader />
+        <div className="mt-24">
+          <Loader />
+        </div>
       ) : (
         <div className="grid grid-cols-3 gap-4">
           <div className="h-full">

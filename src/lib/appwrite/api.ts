@@ -1,6 +1,15 @@
 import { ID, Query } from "appwrite"
 import { appwriteConfig, account, databases, storage, avatars } from "./config"
-import { IClient, IMember, INewClient, IUpdateMember } from "@/types"
+import {
+  IClient,
+  IMember,
+  INewClient,
+  INewOpportunity,
+  INewProject,
+  IOpportunity,
+  IProject,
+  IUpdateMember,
+} from "@/types"
 
 export async function signInAccount(member: {
   email: string
@@ -66,6 +75,17 @@ export async function getMembers() {
   return members
 }
 
+export async function getProfiles() {
+  const profiles = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.profileCollectionId
+  )
+
+  if (!profiles) throw Error
+
+  return profiles
+}
+
 export async function getMemberById(memberId: string) {
   try {
     const member = await databases.getDocument(
@@ -111,7 +131,6 @@ export async function updateMember(member: IUpdateMember) {
         firstName: member.firstName,
         lastName: member.lastName,
         email: member.email,
-        primaryRole: member.primaryRole,
         avatarUrl: avatar.avatarUrl,
         avatarId: avatar.avatarId,
       }
@@ -263,8 +282,10 @@ export async function updateClient(client: IClient) {
       client.id,
       {
         name: client.name,
+        website: client.website,
         description: client.description,
         resources: client.resources,
+        projects: client.projects,
         logoUrl: logo.logoUrl,
         logoId: logo.logoId,
       }
@@ -334,6 +355,196 @@ export async function deleteFile(fileId: string) {
   try {
     await storage.deleteFile(appwriteConfig.storageId, fileId)
     return { status: "ok" }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function createProject(project: INewProject) {
+  try {
+    const newProject = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.projectCollectionId,
+      ID.unique(),
+      {
+        client: project.clientId,
+        title: project.title,
+      }
+    )
+
+    return newProject
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function updateProject(project: IProject) {
+  try {
+    const updatedProject = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.projectCollectionId,
+      project.projectId,
+      {
+        title: project.title,
+        sparkRep: project.sparkRep,
+        briefLink: project.briefLink,
+        additionalLink: project.additionalLink,
+      }
+    )
+
+    if (!updatedProject) {
+      throw Error
+    }
+
+    return updatedProject
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getProjectById(projectId?: string) {
+  if (!projectId) throw Error
+
+  try {
+    const project = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.projectCollectionId,
+      projectId
+    )
+
+    if (!project) throw Error
+
+    return project
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getClientProjects(clientId?: string) {
+  if (!clientId) return
+
+  try {
+    const projects = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.projectCollectionId,
+      [Query.equal("client", clientId), Query.orderDesc("$createdAt")]
+    )
+
+    if (!projects) throw Error
+
+    return projects
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function createOpportunity(opportunity: INewOpportunity) {
+  try {
+    const newOpportunity = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.opportunityCollectionId,
+      ID.unique(),
+      {
+        client: opportunity.clientId,
+        project: opportunity.projectId,
+        member: opportunity.memberId,
+        status: opportunity.status,
+        role: opportunity.role,
+        background: opportunity.background,
+        description: opportunity.description,
+        duration: opportunity.duration,
+        type: opportunity.type,
+        estimatedEarnings: opportunity.estimatedEarnings,
+        responsibilities: opportunity.responsibilities,
+      }
+    )
+
+    return newOpportunity
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function updateOpportunity(opportunity: IOpportunity) {
+  try {
+    const updatedOpportunity = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.opportunityCollectionId,
+      opportunity.opportunityId,
+      {
+        status: opportunity.status,
+        role: opportunity.role,
+        background: opportunity.background,
+        description: opportunity.description,
+        duration: opportunity.duration,
+        type: opportunity.type,
+        estimatedEarnings: opportunity.estimatedEarnings,
+        responsibilities: opportunity.responsibilities,
+      }
+    )
+
+    if (!updatedOpportunity) {
+      throw Error
+    }
+
+    return updatedOpportunity
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getOpportunityById(opportunityId?: string) {
+  if (!opportunityId) throw Error
+
+  try {
+    const opportunity = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.opportunityCollectionId,
+      opportunityId
+    )
+
+    if (!opportunity) throw Error
+
+    return opportunity
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getClientOpportunities(clientId?: string) {
+  if (!clientId) return
+
+  try {
+    const opportunities = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.opportunityCollectionId,
+      [Query.equal("client", clientId), Query.orderDesc("$createdAt")]
+    )
+
+    if (!opportunities) throw Error
+
+    return opportunities
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function deleteOpportunity(
+  opportunityId?: string,
+  clientId?: string
+) {
+  if (!opportunityId) return
+
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.opportunityCollectionId,
+      opportunityId
+    )
+
+    if (!statusCode) throw Error
+
+    return clientId
   } catch (error) {
     console.log(error)
   }

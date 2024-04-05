@@ -5,9 +5,11 @@ import AuthLayout from "./_auth/AuthLayout"
 import RootLayout from "./_root/RootLayout"
 import ClientLayout from "./_root/ClientLayout"
 import { Toaster } from "sonner"
-import ClientForm from "@/components/shared/client/ClientForm"
-import ClientResources from "./components/shared/client/ClientResources"
+import ClientSettings from "@/components/shared/client/ClientSettings"
+import ClientOpportunities from "./components/shared/client/ClientOpportunities"
 import ProfileSettings from "./_root/pages/ProfileSettings"
+import ClientProject from "./components/shared/client/ClientProject"
+import ClientDocuments from "./components/shared/client/ClientDocuments"
 import "./globals.css"
 
 const App = () => (
@@ -23,8 +25,20 @@ const App = () => (
         <Route path="/clients" element={<Clients />} />
         <Route element={<ClientLayout />}>
           <Route path="/clients/:id" element={<Client />} />
-          <Route path="/clients/:id/settings" element={<ClientForm />} />
-          <Route path="/clients/:id/resources" element={<ClientResources />} />
+          <Route
+            path="/clients/:id/opportunities"
+            element={<ClientOpportunities />}
+          />
+          <Route path="/clients/:id/settings" element={<ClientSettings />} />
+          <Route path="/clients/:id/documents" element={<ClientDocuments />} />
+          <Route
+            path="/clients/:id/invoices"
+            element={<p>Invoices will be shown here.</p>}
+          />
+          <Route
+            path="/clients/:id/project/:projectId"
+            element={<ClientProject />}
+          />
         </Route>
         <Route path="/profile-settings/:id" element={<ProfileSettings />} />
       </Route>

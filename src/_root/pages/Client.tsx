@@ -1,7 +1,7 @@
-import ClientProgress from "@/components/shared/client/ClientProgress"
+import ClientProjects from "@/components/shared/client/ClientProjects"
 
 const Client = () => {
-  return <ClientProgress />
+  return <ClientProjects />
 }
 
 export default Client

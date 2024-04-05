@@ -23,7 +23,7 @@ import { ClientValidation } from "@/lib/validation"
 import { useUpdateClient } from "@/lib/react-query/queries"
 import { RotateCw } from "lucide-react"
 
-const ClientForm = () => {
+const ClientSettings = () => {
   const navigate = useNavigate()
   const client = useClient()
   const confirm = useConfirm()
@@ -31,6 +31,7 @@ const ClientForm = () => {
     resolver: zodResolver(ClientValidation),
     defaultValues: {
       name: client ? client.name : "",
+      website: client ? client.website : "",
       description: client ? client.description : "",
       file: [],
     },
@@ -105,6 +106,21 @@ const ClientForm = () => {
 
           <FormField
             control={form.control}
+            name="website"
+            defaultValue={client.website}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Website</FormLabel>
+                <FormControl>
+                  <Input type="url" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
             name="description"
             defaultValue={client.description}
             render={({ field }) => (
@@ -162,4 +178,4 @@ const ClientForm = () => {
   )
 }
 
-export default ClientForm
+export default ClientSettings

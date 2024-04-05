@@ -42,10 +42,10 @@ const ProfileSettings = () => {
   const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
     const updatedMember = await updateMember({
       memberId: currentMember.$id,
+      profileId: currentMember.profileId,
       firstName: value.firstName,
       lastName: value.lastName,
       email: value.email,
-      primaryRole: value.primaryRole,
       file: value.file,
       avatarUrl: currentMember.avatarUrl,
       avatarId: currentMember.avatarId,
@@ -62,7 +62,6 @@ const ProfileSettings = () => {
       firstName: updatedMember?.firstName,
       lastName: updatedMember?.lastName,
       email: updatedMember?.email,
-      primaryRole: updatedMember?.primaryRole,
       avatarUrl: updatedMember?.avatarUrl,
     })
     return navigate(`/`)

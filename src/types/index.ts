@@ -7,51 +7,70 @@ export type INewMember = {
 
 export type IMember = {
   id: string
-  emailVerification: boolean
   email: string
-  name: string
   firstName: string
   lastName: string
-  website: string
-  linkedin: string
-  primaryRole: string
-  seniority: string
-  workStatus: string
-  rate: string
-  skills: string[]
-  domains: string[]
+  emailVerification: boolean
+  importedAnswers: boolean
+  name: string
   timezone: string
-  availability: string
   status: "form completed" | "1on1 done" | "accepted" | "rejected" | null
-  meeting: string
   avatarUrl: string
   avatarId: string
-  clients: IClient[]
   contractSigned: boolean
+  profile: {
+    workStatus: string
+    seniority: string
+    rate: string
+    roles: string[]
+    skills: string[]
+    domains: string[]
+    availability: string
+    lookingFor: string
+    website: string
+    linkedin: string
+    github: string
+    x: string
+    farcaster: string
+    dribbble: string
+    behance: string
+  }
+  profileId: string
+  projects: IProject[]
 }
 
 export type IUpdateMember = {
   memberId: string
+  email: string
+  firstName: string
+  lastName: string
+  profileId: string
   emailVerification?: boolean
-  email?: string | null
-  firstName?: string | null
-  lastName?: string | null
-  website?: string | null
-  linkedin?: string | null
-  primaryRole?: string | null
-  seniority?: string | null
-  workStatus?: string | null
-  rate?: string | null
-  skills?: string[] | null
-  domains?: string[] | null
-  timezone?: string | null
-  availability?: string | null
-  status?: "form completed" | "1on1 done" | "accepted" | "rejected" | null
-  meeting?: string | null
-  avatarUrl?: URL | string
-  avatarId: string
+  importedAnswers?: boolean
   file: File[]
+  avatarId: string
+  avatarUrl?: URL | string
+  timezone?: string | null
+  status?: "form completed" | "1on1 done" | "accepted" | "rejected" | null
   contractSigned?: boolean
+  profile?: {
+    workStatus?: string
+    seniority?: string
+    rate?: string
+    roles?: string[]
+    skills?: string[]
+    domains?: string[]
+    availability?: string
+    lookingFor?: string
+    website?: string
+    linkedin?: string
+    github?: string
+    x?: string
+    farcaster?: string
+    dribbble?: string
+    behance?: string
+  }
+  projects?: IProject[]
 }
 
 export type INewClient = {
@@ -62,12 +81,14 @@ export type INewClient = {
 export type IClient = {
   id: string
   name: string
-  logoUrl: URL | string
-  logoId: string
-  file: File[]
+  website?: string
   description?: string
   members?: IMember[]
   resources?: IResource[]
+  projects?: IProject[]
+  logoUrl: URL | string
+  logoId: string
+  file: File[]
 }
 
 export type IResource = {
@@ -79,4 +100,78 @@ export type IResource = {
 export type IOption = {
   label: string
   value: string
+  [key: string]: string | boolean | undefined
+}
+
+export type INewProject = {
+  clientId: string
+  title: string
+}
+
+export type IProject = {
+  projectId: string
+  title: string
+  briefLink?: string
+  additionalLink?: string
+  sparkRep?: string
+  status?: string
+  client?: IClient
+  team?: IMember[] | null
+}
+
+export type INewOpportunity = {
+  clientId: string
+  projectId: string
+  memberId: string
+  status: string
+  role: string
+  background: string
+  description: string
+  duration: string
+  type: string
+  estimatedEarnings: string
+  responsibilities: string
+}
+
+export type IOpportunity = {
+  opportunityId: string
+  status?: string
+  role?: string
+  background?: string
+  description?: string
+  duration?: string
+  type?: string
+  estimatedEarnings?: string
+  responsibilities?: string
+}
+
+export type INewMilestone = {
+  projectId: string
+  title: string
+}
+
+export type IMilestone = {
+  milestoneId: string
+  title: string
+  status?: "in progress" | "approved"
+}
+
+export type INewUpdate = {
+  memberId: string
+  milestoneId: string
+  title: string
+  type?: string
+  link?: string
+  file?: File[]
+  description?: string
+}
+
+export type IUpdate = {
+  updateId: string
+  title: string
+  link?: string
+  type?: string
+  milestone?: string
+  description?: string
+  feedback?: string
 }
