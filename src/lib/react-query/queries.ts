@@ -115,7 +115,10 @@ export const useUpdateProject = () => {
     onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_PROJECT_BY_ID, data?.$id],
-      })
+      }),
+        queryClient.invalidateQueries({
+          queryKey: [QUERY_KEYS.GET_CLIENT_BY_ID, data?.client.$id],
+        })
     },
   })
 }

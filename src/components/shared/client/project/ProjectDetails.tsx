@@ -49,6 +49,7 @@ const ProjectDetails = ({ project }) => {
   const handleUpdate = async (values: z.infer<typeof ProjectValidation>) => {
     const updatedProject = await updateProject({
       projectId: project.$id,
+      client: project.client.$id,
       title: values.title,
       sparkRep: values.sparkRep,
       briefLink: values.briefLink,

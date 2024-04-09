@@ -385,6 +385,7 @@ export async function updateProject(project: IProject) {
       appwriteConfig.projectCollectionId,
       project.projectId,
       {
+        client: project.client,
         title: project.title,
         sparkRep: project.sparkRep,
         briefLink: project.briefLink,

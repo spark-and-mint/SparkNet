@@ -4,7 +4,10 @@ import { Models } from "appwrite"
 import { FolderX, MoreHorizontal } from "lucide-react"
 import Loader from "../Loader"
 import CreateNewOpportunity from "./opportunities/CreateNewOpportunity"
-import { useGetClientOpportunities } from "@/lib/react-query/queries"
+import {
+  useDeleteOpportunity,
+  useGetClientOpportunities,
+} from "@/lib/react-query/queries"
 import { Avatar, AvatarImage } from "@/components/ui/avatar"
 import {
   DropdownMenu,
@@ -25,7 +28,6 @@ import {
 import OpportunityForm from "./opportunities/OpportunityForm"
 import { toast } from "sonner"
 import { useConfirm } from "../AlertDialogProvider"
-import { deleteOpportunity } from "@/lib/appwrite/api"
 import {
   AlertDialog,
   AlertDialogAction,
@@ -42,6 +44,7 @@ const ClientOpportunities = () => {
   const { data: opportunities, isPending } = useGetClientOpportunities(
     client.$id
   )
+  const { mutateAsync: deleteOpportunity } = useDeleteOpportunity()
   const [showDialog, setShowDialog] = useState(false)
   const [showEmailDialog, setShowEmailDialog] = useState(false)
 
@@ -53,10 +56,10 @@ const ClientOpportunities = () => {
             Accepted
           </span>
         )
-      case "rejected":
+      case "declined":
         return (
           <span className="bg-red-100 text-red-800 text-xs font-medium me-2 px-1.5 py-0.5 rounded border border-red-400">
-            Rejected
+            Declined
           </span>
         )
       default:
@@ -69,7 +72,7 @@ const ClientOpportunities = () => {
   }
 
   const handleDelete = async (opportunityId: string) => {
-    const deleteConfirmed = confirm({
+    const deleteConfirmed = await confirm({
       title: `Deleting opportunity`,
       body: "Are you sure you want to do that?",
       cancelButton: "Cancel",
@@ -79,7 +82,7 @@ const ClientOpportunities = () => {
     if (!deleteConfirmed) return
 
     try {
-      await deleteOpportunity(opportunityId, client.$id)
+      await deleteOpportunity({ opportunityId, clientId: client.$id })
       toast.success("Opportunity deleted successfully.")
     } catch (error) {
       toast.error("Could not delete opportunity.")
@@ -103,7 +106,7 @@ const ClientOpportunities = () => {
               {opportunities?.documents.map((opportunity: Models.Document) => (
                 <Fragment key={opportunity.$id}>
                   <div className="mb-8 pb-5 border-b">
-                    <div className="mb-2 flex items-center justify-between">
+                    <div className="relative mb-2 flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <Avatar className="w-10 h-10">
                           <AvatarImage src={opportunity.member.avatarUrl} />
@@ -118,12 +121,15 @@ const ClientOpportunities = () => {
                           </p>
                         </div>
                       </div>
-                      <div>{getStatusBadge(opportunity.status)}</div>
+                      <div className="absolute ml-6 left-1/2 -translate-x-1/2">
+                        {getStatusBadge(opportunity.status)}
+                      </div>
                       <div className="flex gap-4">
                         <Button
                           size="sm"
                           variant="outline"
                           onClick={() => setShowEmailDialog(true)}
+                          disabled={opportunity.status !== "awaiting response"}
                         >
                           Notify by email
                         </Button>

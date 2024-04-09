@@ -62,7 +62,6 @@ const OpportunityForm = ({
 
   const { mutateAsync: createOpportunity, isPending: isLoadingCreate } =
     useCreateOpportunity()
-
   const { mutateAsync: updateOpportunity, isPending: isLoadingUpdate } =
     useUpdateOpportunity()
 
@@ -100,8 +99,6 @@ const OpportunityForm = ({
       setShowDialog(false)
     }
   }
-
-  console.log(opportunity)
 
   return (
     <Form {...form}>
