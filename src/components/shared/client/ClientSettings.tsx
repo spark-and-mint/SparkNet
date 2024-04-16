@@ -30,9 +30,9 @@ const ClientSettings = () => {
   const form = useForm<z.infer<typeof ClientValidation>>({
     resolver: zodResolver(ClientValidation),
     defaultValues: {
-      name: client ? client.name : "",
-      website: client ? client.website : "",
-      description: client ? client.description : "",
+      name: client?.name ?? "",
+      website: client.website ?? "",
+      description: client.description ?? "",
       file: [],
     },
   })
@@ -40,9 +40,9 @@ const ClientSettings = () => {
   const { mutateAsync: updateClient, isPending: isLoadingUpdate } =
     useUpdateClient()
 
-  const handleSubmit = async (value: z.infer<typeof ClientValidation>) => {
+  const handleSubmit = async (values: z.infer<typeof ClientValidation>) => {
     const updatedClient = await updateClient({
-      ...value,
+      ...values,
       id: client.$id,
       logoId: client.logoId,
       logoUrl: client.logoUrl,
@@ -106,21 +106,6 @@ const ClientSettings = () => {
 
           <FormField
             control={form.control}
-            name="website"
-            defaultValue={client.website}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Website</FormLabel>
-                <FormControl>
-                  <Input type="url" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="description"
             defaultValue={client.description}
             render={({ field }) => (
@@ -131,6 +116,54 @@ const ClientSettings = () => {
                     placeholder="About the client"
                     className="resize-none"
                     {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="website"
+            defaultValue={client.website}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Website</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="https://openai.com" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="x"
+            defaultValue={client.x}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>X</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="https://x.com/client" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="linkedin"
+            defaultValue={client.linkedin}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>LinkedIn</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="https://linkedin.com/in/client"
                   />
                 </FormControl>
                 <FormMessage />

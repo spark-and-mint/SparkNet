@@ -1,4 +1,4 @@
-import { ID, Query } from "appwrite"
+import { ID, Models, Query } from "appwrite"
 import { appwriteConfig, account, databases, storage, avatars } from "./config"
 import {
   IClient,
@@ -10,6 +10,7 @@ import {
   IProject,
   IUpdateMember,
 } from "@/types"
+import { nanoid } from "nanoid"
 
 export async function signInAccount(member: {
   email: string
@@ -189,7 +190,7 @@ export async function createClient(client: INewClient) {
       ID.unique(),
       {
         name: client.name,
-        logoId: uploadedFile ? uploadedFile.$id : ID.unique(),
+        logoId: uploadedFile ? uploadedFile.$id : nanoid(),
         logoUrl,
       }
     )
@@ -282,8 +283,10 @@ export async function updateClient(client: IClient) {
       client.id,
       {
         name: client.name,
-        website: client.website,
         description: client.description,
+        website: client.website,
+        x: client.x,
+        linkedin: client.linkedin,
         resources: client.resources,
         projects: client.projects,
         logoUrl: logo.logoUrl,
@@ -367,8 +370,9 @@ export async function createProject(project: INewProject) {
       appwriteConfig.projectCollectionId,
       ID.unique(),
       {
-        client: project.clientId,
+        clientId: project.clientId,
         title: project.title,
+        status: "in progress",
       }
     )
 
@@ -385,11 +389,10 @@ export async function updateProject(project: IProject) {
       appwriteConfig.projectCollectionId,
       project.projectId,
       {
-        client: project.client,
         title: project.title,
         sparkRep: project.sparkRep,
         briefLink: project.briefLink,
-        additionalLink: project.additionalLink,
+        roadmapLink: project.roadmapLink,
       }
     )
 
@@ -428,7 +431,7 @@ export async function getClientProjects(clientId?: string) {
     const projects = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.projectCollectionId,
-      [Query.equal("client", clientId), Query.orderDesc("$createdAt")]
+      [Query.equal("clientId", clientId), Query.orderDesc("$createdAt")]
     )
 
     if (!projects) throw Error
@@ -446,9 +449,9 @@ export async function createOpportunity(opportunity: INewOpportunity) {
       appwriteConfig.opportunityCollectionId,
       ID.unique(),
       {
-        client: opportunity.clientId,
-        project: opportunity.projectId,
-        member: opportunity.memberId,
+        clientId: opportunity.clientId,
+        projectId: opportunity.projectId,
+        memberId: opportunity.memberId,
         status: opportunity.status,
         role: opportunity.role,
         background: opportunity.background,
@@ -519,7 +522,7 @@ export async function getClientOpportunities(clientId?: string) {
     const opportunities = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.opportunityCollectionId,
-      [Query.equal("client", clientId), Query.orderDesc("$createdAt")]
+      [Query.equal("clientId", clientId), Query.orderDesc("$createdAt")]
     )
 
     if (!opportunities) throw Error
@@ -546,6 +549,27 @@ export async function deleteOpportunity(
     if (!statusCode) throw Error
 
     return clientId
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getProjectMilestones(projectId?: string) {
+  if (!projectId) return
+
+  try {
+    const milestones = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.milestoneCollectionId
+    )
+
+    if (!milestones) throw Error
+
+    const projectMilestones = milestones.documents.filter(
+      (milestone: Models.Document) => milestone.projectId === projectId
+    )
+
+    return projectMilestones
   } catch (error) {
     console.log(error)
   }

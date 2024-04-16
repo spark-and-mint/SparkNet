@@ -10,6 +10,25 @@ const ClientProjects = () => {
   const client = useClient()
   const { data: projects, isPending } = useGetClientProjects(client.$id)
 
+  const getProjectStatus = (status: string) => {
+    switch (status) {
+      case "in progress":
+        return (
+          <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2 py-0.5 rounded  border border-yellow-300">
+            In progress
+          </span>
+        )
+      case "completed":
+        return (
+          <span className="bg-green-100 text-green-800 text-xs font-medium me-2 px-2 py-0.5 rounded  border border-green-300">
+            Completed
+          </span>
+        )
+      default:
+        return null
+    }
+  }
+
   return (
     <div>
       {isPending && !projects ? (
@@ -22,9 +41,7 @@ const ClientProjects = () => {
                 <div className="text-sm font-semibold mr-4">
                   {project.title}
                 </div>
-                <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2 py-0.5 rounded  border border-yellow-300">
-                  In progress
-                </span>
+                {getProjectStatus(project.status)}
                 <Button asChild size="sm" variant="outline" className="ml-auto">
                   <Link to={`/clients/${client.$id}/project/${project.$id}`}>
                     View project

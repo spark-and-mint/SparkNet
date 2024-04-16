@@ -9,8 +9,12 @@ import { Button } from "../../ui/button"
 import { Avatar, AvatarFallback } from "../../ui/avatar"
 import { Link } from "react-router-dom"
 import { Models } from "appwrite"
+import { useGetClientProjects } from "@/lib/react-query/queries"
+import Loader from "../Loader"
 
 const ClientCard = ({ client }: { client: Models.Document }) => {
+  const { data: projects, isPending } = useGetClientProjects(client.$id)
+
   return (
     <Card className="flex flex-col justify-between h-full">
       <CardHeader>
@@ -36,16 +40,20 @@ const ClientCard = ({ client }: { client: Models.Document }) => {
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="flex flex-col gap-4">
-            {client.projects && client.projects.length > 0 ? (
-              <p className="text-center py-8">
-                {client.projects.length} active{" "}
-                {client.projects.length > 1 ? "projects" : "project"}
-              </p>
-            ) : (
-              <p className="text-center py-8">No active projects</p>
-            )}
-          </div>
+          {isPending && !projects ? (
+            <Loader noText className="h-auto" />
+          ) : (
+            <div className="flex flex-col gap-4">
+              {projects && projects.documents.length > 0 ? (
+                <p className="text-center py-8">
+                  {projects.documents.length} active{" "}
+                  {projects.documents.length > 1 ? "projects" : "project"}
+                </p>
+              ) : (
+                <p className="text-center py-8">No active projects</p>
+              )}
+            </div>
+          )}
         </div>
       </CardContent>
       <CardFooter>

@@ -67,7 +67,7 @@ const ClientDocuments = () => {
     })
 
     if (!updatedClient) {
-      toast.error("Failed to update client. Please try again.")
+      toast.error("This is not wired up yet.")
     } else {
       toast.success("Client updated successfully!")
     }
@@ -86,7 +86,7 @@ const ClientDocuments = () => {
         <form onSubmit={form.handleSubmit(handleSubmit)}>
           <div className="space-y-7 divide-y">
             {fields.length === 0 ? (
-              <p className="py-3 text-sm">No resources added yet.</p>
+              <p className="py-3 text-sm">No documents added yet.</p>
             ) : (
               <>
                 {fields.map((field, index) => (

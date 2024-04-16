@@ -82,6 +82,8 @@ export type IClient = {
   id: string
   name: string
   website?: string
+  x?: string
+  linkedin?: string
   description?: string
   members?: IMember[]
   resources?: IResource[]
@@ -112,11 +114,10 @@ export type IProject = {
   projectId: string
   title: string
   briefLink?: string
-  additionalLink?: string
+  roadmapLink?: string
   sparkRep?: string
   status?: string
-  client?: IClient
-  team?: IMember[] | null
+  team?: string[]
 }
 
 export type INewOpportunity = {
@@ -125,11 +126,11 @@ export type INewOpportunity = {
   memberId: string
   status: string
   role: string
-  background: string
+  background?: string
   description: string
   duration: string
   type: string
-  estimatedEarnings: string
+  estimatedEarnings?: string
   responsibilities: string
 }
 

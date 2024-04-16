@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dialog"
 import OpportunityForm from "./OpportunityForm"
 
-const CreateNewOpportunity = ({ projects, clientId }) => {
+const CreateNewOpportunity = ({ clientId }) => {
   const [showDialog, setShowDialog] = useState(false)
 
   return (
@@ -37,7 +37,6 @@ const CreateNewOpportunity = ({ projects, clientId }) => {
           action="Create"
           setShowDialog={setShowDialog}
           clientId={clientId}
-          projects={projects}
         />
       </DialogContent>
     </Dialog>

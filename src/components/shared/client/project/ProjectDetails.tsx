@@ -37,23 +37,23 @@ const ProjectDetails = ({ project }) => {
   const form = useForm<z.infer<typeof ProjectValidation>>({
     resolver: zodResolver(ProjectValidation),
     defaultValues: {
-      title: project?.title,
-      sparkRep: project?.sparkRep,
-      briefLink: project?.briefLink,
-      additionalLink: project?.additionalLink,
+      title: project.title,
+      sparkRep: project.sparkRep?.$id ?? "",
+      briefLink: project.briefLink ?? "",
+      roadmapLink: project.roadmapLink ?? "",
     },
   })
 
   const { mutateAsync: updateProject, isPending } = useUpdateProject()
 
   const handleUpdate = async (values: z.infer<typeof ProjectValidation>) => {
+    console.log(values)
     const updatedProject = await updateProject({
       projectId: project.$id,
-      client: project.client.$id,
       title: values.title,
       sparkRep: values.sparkRep,
       briefLink: values.briefLink,
-      additionalLink: values.additionalLink,
+      roadmapLink: values.roadmapLink,
     })
 
     if (!updatedProject) {
@@ -62,6 +62,8 @@ const ProjectDetails = ({ project }) => {
       toast.success("Project updated successfully.")
     }
   }
+
+  console.log(members)
 
   return (
     <Card className="py-6 px-4">
@@ -101,7 +103,10 @@ const ProjectDetails = ({ project }) => {
                         </SelectTrigger>
                         <SelectContent>
                           {members?.documents.map((member) => (
-                            <SelectItem key={member.$id} value={member.$id}>
+                            <SelectItem
+                              key={member.accountId}
+                              value={member.$id}
+                            >
                               {member.firstName} {member.lastName}
                             </SelectItem>
                           ))}
@@ -124,7 +129,7 @@ const ProjectDetails = ({ project }) => {
                     <Input
                       type="text"
                       {...field}
-                      placeholder="https://page.notion.site"
+                      placeholder="https://page.notion.site/document"
                     />
                   </FormItem>
                 )}
@@ -132,14 +137,14 @@ const ProjectDetails = ({ project }) => {
 
               <FormField
                 control={form.control}
-                name="additionalLink"
+                name="roadmapLink"
                 render={({ field }) => (
                   <FormItem>
-                    <Label>Additional link</Label>
+                    <Label>Roadmap link</Label>
                     <Input
                       type="text"
                       {...field}
-                      placeholder="Anything else related to the project"
+                      placeholder="https://page.notion.site/document"
                     />
                   </FormItem>
                 )}

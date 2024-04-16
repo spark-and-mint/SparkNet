@@ -20,4 +20,7 @@ export enum QUERY_KEYS {
   GET_OPPORTUNITY_BY_ID = "getOpportunityById",
   GET_CLIENT_OPPORTUNITIES = "getClientOpportunities",
   GET_MEMBER_OPPORTUNITIES = "getMemberOpportunities",
+
+  // MILESTONE KEYS
+  GET_PROJECT_MILESTONES = "getProjectMilestones",
 }

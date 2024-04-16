@@ -25,6 +25,7 @@ import {
   getOpportunityById,
   getProfiles,
   getProjectById,
+  getProjectMilestones,
   signInAccount,
   signOutAccount,
   updateClient,
@@ -41,7 +42,7 @@ export const useCreateOpportunity = () => {
       createOpportunity(opportunity),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_CLIENT_OPPORTUNITIES, data?.client.$id],
+        queryKey: [QUERY_KEYS.GET_CLIENT_OPPORTUNITIES, data?.clientId],
       })
     },
   })
@@ -99,10 +100,10 @@ export const useCreateProject = () => {
     mutationFn: (project: INewProject) => createProject(project),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GET_CLIENT_PROJECTS, data?.client.$id],
+        queryKey: [QUERY_KEYS.GET_CLIENT_PROJECTS, data?.clientId],
       }),
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_CLIENT_BY_ID, data?.client.$id],
+          queryKey: [QUERY_KEYS.GET_CLIENT_BY_ID, data?.clientId],
         })
     },
   })
@@ -117,7 +118,7 @@ export const useUpdateProject = () => {
         queryKey: [QUERY_KEYS.GET_PROJECT_BY_ID, data?.$id],
       }),
         queryClient.invalidateQueries({
-          queryKey: [QUERY_KEYS.GET_CLIENT_BY_ID, data?.client.$id],
+          queryKey: [QUERY_KEYS.GET_CLIENT_BY_ID, data?.clientId],
         })
     },
   })
@@ -263,5 +264,13 @@ export const useDeleteClient = () => {
         queryKey: [QUERY_KEYS.GET_CLIENTS],
       })
     },
+  })
+}
+
+export const useGetProjectMilestones = (projectId?: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_PROJECT_MILESTONES, projectId],
+    queryFn: () => getProjectMilestones(projectId),
+    enabled: !!projectId,
   })
 }

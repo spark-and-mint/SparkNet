@@ -22,6 +22,7 @@ import { OpportunityValidation } from "@/lib/validation"
 import { toast } from "sonner"
 import {
   useCreateOpportunity,
+  useGetClientProjects,
   useGetMembers,
   useUpdateOpportunity,
 } from "@/lib/react-query/queries"
@@ -33,7 +34,6 @@ type OpportunityFormProps = {
   action: "Create" | "Update"
   setShowDialog: (value: boolean) => void
   clientId: string
-  projects: Models.Document[]
 }
 
 const OpportunityForm = ({
@@ -41,22 +41,23 @@ const OpportunityForm = ({
   action,
   setShowDialog,
   clientId,
-  projects,
 }: OpportunityFormProps) => {
   const { data: members, isPending: isPendingMembers } = useGetMembers()
+  const { data: projects, isPending: isPendingProjects } =
+    useGetClientProjects(clientId)
 
   const form = useForm<z.infer<typeof OpportunityValidation>>({
     resolver: zodResolver(OpportunityValidation),
     defaultValues: {
-      projectId: opportunity?.project.$id,
-      memberId: opportunity?.member.$id,
-      role: opportunity?.role,
-      background: opportunity?.background,
-      description: opportunity?.description,
-      duration: opportunity?.duration,
-      type: opportunity?.type,
-      estimatedEarnings: opportunity?.estimatedEarnings,
-      responsibilities: opportunity?.responsibilities,
+      projectId: opportunity?.projectId ?? "",
+      memberId: opportunity?.memberId ?? "",
+      role: opportunity?.role ?? "",
+      background: opportunity?.background ?? "",
+      description: opportunity?.description ?? "",
+      duration: opportunity?.duration ?? "",
+      type: opportunity?.type ?? "",
+      estimatedEarnings: opportunity?.estimatedEarnings ?? "",
+      responsibilities: opportunity?.responsibilities ?? "",
     },
   })
 
@@ -116,12 +117,13 @@ const OpportunityForm = ({
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        disabled={isPendingProjects}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select project" />
                         </SelectTrigger>
                         <SelectContent>
-                          {projects.map((project) => (
+                          {projects?.documents.map((project) => (
                             <SelectItem key={project.$id} value={project.$id}>
                               {project.title}
                             </SelectItem>
@@ -137,7 +139,6 @@ const OpportunityForm = ({
               <FormField
                 control={form.control}
                 name="memberId"
-                disabled={isPendingMembers}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Member</FormLabel>
@@ -145,6 +146,7 @@ const OpportunityForm = ({
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
+                        disabled={isPendingMembers}
                       >
                         <SelectTrigger>
                           <SelectValue placeholder="Select member" />
@@ -226,7 +228,7 @@ const OpportunityForm = ({
                 defaultValue={opportunity?.estimatedEarnings}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Estimated earnings</FormLabel>
+                    <FormLabel>Estimated earnings (optional)</FormLabel>
                     <FormControl>
                       <Input
                         type="text"
@@ -249,7 +251,7 @@ const OpportunityForm = ({
                 defaultValue={opportunity?.background}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Background</FormLabel>
+                    <FormLabel>Background (optional)</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}

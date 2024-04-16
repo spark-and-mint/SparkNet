@@ -1,75 +1,57 @@
-import { CircleSlash, ExternalLink, Pickaxe, ThumbsUp } from "lucide-react"
-import { Link } from "react-router-dom"
-import { Button } from "@/components/ui/button"
-import {
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-  Table,
-} from "@/components/ui/table"
+import { CircleSlash, Pickaxe, ThumbsUp, TriangleAlert } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
-import { Avatar, AvatarImage } from "@/components/ui/avatar"
+import { Models } from "appwrite"
 
-interface MilestoneProps {
-  title: string
-  status: string
-  updates: any[]
-}
-
-const getMilestoneStatus = (feedback: string) => {
-  switch (feedback) {
+const getMilestoneStatus = (status: string) => {
+  switch (status) {
     case "approved":
       return (
         <span className="flex items-center  px-1.5 py-1 text-green-500 font-medium text-sm bg-green-400/20 border border-green-400/20 rounded-md">
           Approved <ThumbsUp className="w-4 h-4 ml-1.5 pb-0.25" />
         </span>
       )
-    case "in-progress":
+    case "in progress":
       return (
         <span className="flex items-center  px-1.5 py-1 text-yellow-500 font-medium text-sm bg-amber-400/20 border border-amber-400/20 rounded-md">
           In progress <Pickaxe className="w-4 h-4 ml-1.5 pb-0.25" />
         </span>
       )
+    case "approval requested":
+      return (
+        <span className="flex items-center  px-1.5 py-1 text-cyan-400 font-medium text-sm bg-muted border border-cyan-400/30 rounded-md">
+          Approval requested <TriangleAlert className="w-4 h-4 ml-1.5" />
+        </span>
+      )
+    case "approval rejected":
+      return (
+        <span className="flex items-center  px-1.5 py-1 text-red-500 font-medium text-sm bg-red-400/20 border border-red-400/20 rounded-md">
+          Approval rejected <CircleSlash className="w-4 h-4 ml-1.5 pb-0.25" />
+        </span>
+      )
     default:
       return (
-        <span className="flex items-center  px-1.5 py-1 text-cyan-500 font-medium text-sm bg-muted border border-cyan-400/20 rounded-md">
-          Not started <CircleSlash className="w-4 h-4 ml-1.5 pb-0.25" />
+        <span className="flex items-center  px-1.5 py-1 text-gray-400 font-medium text-sm bg-muted border border-gray-400/20 rounded-md">
+          Not started
         </span>
       )
   }
 }
 
-const Milestone = ({ title, status, updates }: MilestoneProps) => {
+const Milestone = ({ milestone }: { milestone: Models.Document }) => {
   return (
     <Card className="p-2">
       <CardHeader>
         <div className="flex flex-col gap-4 justify-between lg:flex-row lg:items-center mb-4">
           <div className="flex items-center">
-            <h5 className="font-medium">{title}</h5>
-            <div className="ml-4">{getMilestoneStatus(status)}</div>
+            <h5 className="font-medium">{milestone.title}</h5>
+            <div className="ml-4">{getMilestoneStatus(milestone.status)}</div>
           </div>
         </div>
       </CardHeader>
 
       <CardContent>
-        {updates.length === 0 ? (
+        <p>Updates will be shown here.</p>
+        {/* {updates.length === 0 ? (
           <p className="pt-6 pb-14 text-sm text-center">
             No updates added yet.
           </p>
@@ -158,36 +140,12 @@ const Milestone = ({ title, status, updates }: MilestoneProps) => {
                         </DialogContent>
                       </Dialog>
                     </TableCell>
-
-                    {/*
-                    <TableCell>
-                      <div className="flex justify-end mr-4">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                              <span className="sr-only">Open menu</span>
-                              <MoreHorizontal className="h-6 w-6" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit update</DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem>
-                              <span className="font-medium text-[#e40808]">
-                                Delete
-                              </span>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </TableCell>
-                    */}
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
           </>
-        )}
+        )} */}
       </CardContent>
     </Card>
   )
