@@ -30,11 +30,11 @@ const ClientSettings = () => {
   const form = useForm<z.infer<typeof ClientValidation>>({
     resolver: zodResolver(ClientValidation),
     defaultValues: {
-      name: client?.name ?? "",
-      website: client.website ?? "",
-      description: client.description ?? "",
-      x: client.x ?? "",
-      linkedin: client.linkedin ?? "",
+      name: client?.name,
+      website: client?.website,
+      description: client?.description,
+      x: client?.x,
+      linkedin: client?.linkedin,
       file: [],
     },
   })
