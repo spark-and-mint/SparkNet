@@ -22,10 +22,12 @@ import {
   getClients,
   getMemberById,
   getMembers,
+  getMilestoneUpdates,
   getOpportunityById,
   getProfiles,
   getProjectById,
   getProjectMilestones,
+  getProjectTeam,
   signInAccount,
   signOutAccount,
   updateClient,
@@ -272,5 +274,21 @@ export const useGetProjectMilestones = (projectId?: string) => {
     queryKey: [QUERY_KEYS.GET_PROJECT_MILESTONES, projectId],
     queryFn: () => getProjectMilestones(projectId),
     enabled: !!projectId,
+  })
+}
+
+export const useGetMilestoneUpdates = (milestoneId?: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_MILESTONE_UPDATES, milestoneId],
+    queryFn: () => getMilestoneUpdates(milestoneId),
+    enabled: !!milestoneId,
+  })
+}
+
+export const useGetProjectTeam = (projectId?: string, memberIds?: string[]) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_PROJECT_TEAM, memberIds],
+    queryFn: () => getProjectTeam(projectId, memberIds),
+    enabled: !!memberIds,
   })
 }

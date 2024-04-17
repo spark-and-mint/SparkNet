@@ -34,7 +34,7 @@ const ClientProject = () => {
                 <ProjectMilestones projectId={project?.$id} />
               </TabsContent>
               <TabsContent value="team">
-                <ProjectTeam team={project?.team} />
+                <ProjectTeam project={project} />
               </TabsContent>
             </Tabs>
           </div>

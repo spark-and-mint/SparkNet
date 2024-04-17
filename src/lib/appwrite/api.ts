@@ -574,3 +574,70 @@ export async function getProjectMilestones(projectId?: string) {
     console.log(error)
   }
 }
+
+export async function getMilestoneUpdates(milestoneId?: string) {
+  if (!milestoneId) return
+
+  try {
+    const updates = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.updateCollectionId
+    )
+
+    if (!updates) throw Error
+
+    const milestoneUpdates = updates.documents.filter(
+      (update: Models.Document) => update.milestoneId === milestoneId
+    )
+
+    return milestoneUpdates
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getProjectTeam(
+  projectId?: string,
+  memberIds: string[] = []
+) {
+  if (!projectId || !memberIds.length)
+    throw Error("Invalid project ID or member IDs")
+
+  try {
+    const opportunities = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.opportunityCollectionId,
+      [Query.equal("projectId", projectId)]
+    )
+
+    const memberRoles = opportunities.documents.reduce((acc, doc) => {
+      if (memberIds.includes(doc.memberId)) {
+        acc[doc.memberId] = doc.role
+      }
+      return acc
+    }, {})
+
+    const teamMembers = await Promise.all(
+      memberIds.map(async (memberId) => {
+        const memberDetails = await databases.getDocument(
+          appwriteConfig.databaseId,
+          appwriteConfig.memberCollectionId,
+          memberId
+        )
+
+        return {
+          id: memberId,
+          firstName: memberDetails.firstName,
+          lastName: memberDetails.lastName,
+          avatarUrl: memberDetails.avatarUrl,
+          role: memberRoles[memberId] || "Team member",
+        }
+      })
+    )
+
+    return teamMembers
+  } catch (error) {
+    console.error("Failed to fetch project team: ", error)
+    throw new Error("Error fetching project team")
+  }
+}

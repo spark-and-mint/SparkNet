@@ -1,6 +1,8 @@
 import { CircleSlash, Pickaxe, ThumbsUp, TriangleAlert } from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Models } from "appwrite"
+import Update from "./Update"
+import { useGetMilestoneUpdates } from "@/lib/react-query/queries"
 
 const getMilestoneStatus = (status: string) => {
   switch (status) {
@@ -38,6 +40,10 @@ const getMilestoneStatus = (status: string) => {
 }
 
 const Milestone = ({ milestone }: { milestone: Models.Document }) => {
+  const { data: updates, isPending: isPendingUpdates } = useGetMilestoneUpdates(
+    milestone.$id
+  )
+
   return (
     <Card className="p-2">
       <CardHeader>
@@ -50,102 +56,30 @@ const Milestone = ({ milestone }: { milestone: Models.Document }) => {
       </CardHeader>
 
       <CardContent>
-        <p>Updates will be shown here.</p>
-        {/* {updates.length === 0 ? (
-          <p className="pt-6 pb-14 text-sm text-center">
-            No updates added yet.
-          </p>
+        {!updates || isPendingUpdates ? (
+          <div>loading</div>
         ) : (
           <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-center">Creator</TableHead>
-                  <TableHead>Title</TableHead>
-                  <TableHead>Link</TableHead>
-                  <TableHead>Description</TableHead>
-                  <TableHead>Feedback</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {updates.map((update) => (
-                  <TableRow key={update.updateId}>
-                    <TableCell>
-                      <TooltipProvider delayDuration={100}>
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Avatar className="w-8 h-8 mx-auto">
-                              <AvatarImage src={update.member.avatarUrl} />
-                            </Avatar>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>
-                              {update.member.firstName} {update.member.lastName}
-                            </p>
-                          </TooltipContent>
-                        </Tooltip>
-                      </TooltipProvider>
-                    </TableCell>
-                    <TableCell className="font-medium text-sm">
-                      {update.title}
-                    </TableCell>
-                    <TableCell className="text-sm">
-                      <Button asChild variant="link" className="p-0">
-                        <Link
-                          to={update.link ?? "#"}
-                          target="_blank"
-                          className="flex items-center gap-2"
-                        >
-                          Open
-                          <ExternalLink className="h-4 w-4" />
-                        </Link>
-                      </Button>
-                    </TableCell>
-                    <TableCell className="max-w-[16rem] text-sm truncate">
-                      {update.description}
-                    </TableCell>
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="relative"
-                          >
-                            View feedback
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
-                          <DialogHeader>
-                            <DialogTitle>
-                              Feedback on {update.title}
-                            </DialogTitle>
-                          </DialogHeader>
-                          <div className="mt-5 mb-4">
-                            <blockquote className="relative">
-                              <p>
-                                {status === "approved"
-                                  ? "Looks great! 👍🏼"
-                                  : "We appreciate the intuitive navigation and clear structure of the information hierarchy. We have a few suggestions for improvement, though. Please check the Figma for more details."}
-                              </p>
-                            </blockquote>
-                          </div>
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button type="button" variant="secondary">
-                                Close
-                              </Button>
-                            </DialogClose>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            {updates && updates.length === 0 ? (
+              <Card className="flex flex-col items-center justify-center h-full pt-14 pb-16">
+                <h4 className="h4 text-[1.325rem] mt-3 text-center">
+                  There are no updates added yet
+                </h4>
+                <p className="mt-2 text-muted-foreground text-center">
+                  When updates are added by the team, they will be listed here.
+                </p>
+              </Card>
+            ) : (
+              <div className="space-y-8">
+                {updates &&
+                  updates.length > 0 &&
+                  updates?.map((update: Models.Document) => (
+                    <Update key={update.$id} update={update} />
+                  ))}
+              </div>
+            )}
           </>
-        )} */}
+        )}
       </CardContent>
     </Card>
   )
