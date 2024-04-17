@@ -33,6 +33,8 @@ const ClientSettings = () => {
       name: client?.name ?? "",
       website: client.website ?? "",
       description: client.description ?? "",
+      x: client.x ?? "",
+      linkedin: client.linkedin ?? "",
       file: [],
     },
   })
@@ -92,7 +94,6 @@ const ClientSettings = () => {
           <FormField
             control={form.control}
             name="name"
-            defaultValue={client.name}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Name</FormLabel>
@@ -107,7 +108,6 @@ const ClientSettings = () => {
           <FormField
             control={form.control}
             name="description"
-            defaultValue={client.description}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Description</FormLabel>
@@ -126,7 +126,6 @@ const ClientSettings = () => {
           <FormField
             control={form.control}
             name="website"
-            defaultValue={client.website}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Website</FormLabel>
@@ -141,7 +140,6 @@ const ClientSettings = () => {
           <FormField
             control={form.control}
             name="x"
-            defaultValue={client.x}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>X</FormLabel>
@@ -156,7 +154,6 @@ const ClientSettings = () => {
           <FormField
             control={form.control}
             name="linkedin"
-            defaultValue={client.linkedin}
             render={({ field }) => (
               <FormItem>
                 <FormLabel>LinkedIn</FormLabel>
