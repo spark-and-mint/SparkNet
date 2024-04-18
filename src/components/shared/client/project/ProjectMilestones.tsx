@@ -14,7 +14,10 @@ const ProjectMilestones = ({ projectId }) => {
       ) : (
         <>
           {milestones && milestones.length < 1 ? (
-            <p className="pt-5 pb-6 text-sm">No milestones added yet.</p>
+            <>
+              <p className="pt-5 pb-6 text-sm">No milestones added yet.</p>
+              <CreateMilestone projectId={projectId} />
+            </>
           ) : (
             <>
               <div className="flex items-center justify-between my-8">

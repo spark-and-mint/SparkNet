@@ -54,8 +54,16 @@ export const ProjectValidation = z.object({
     .min(2, { message: "Minimum 2 characters." })
     .max(255, { message: "Maximum 255 caracters" }),
   sparkRep: z.string().optional(),
-  briefLink: z.string().url().optional(),
-  roadmapLink: z.string().url().optional(),
+  briefLink: z
+    .string()
+    .url({ message: "Invalid url. Please add https." })
+    .optional()
+    .or(z.literal("")),
+  roadmapLink: z
+    .string()
+    .url({ message: "Invalid url. Please add https." })
+    .optional()
+    .or(z.literal("")),
 })
 
 export const ProfileValidation = z.object({

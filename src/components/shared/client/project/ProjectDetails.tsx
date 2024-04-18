@@ -47,7 +47,6 @@ const ProjectDetails = ({ project }) => {
   const { mutateAsync: updateProject, isPending } = useUpdateProject()
 
   const handleUpdate = async (values: z.infer<typeof ProjectValidation>) => {
-    console.log(values)
     const updatedProject = await updateProject({
       projectId: project.$id,
       title: values.title,
@@ -62,8 +61,6 @@ const ProjectDetails = ({ project }) => {
       toast.success("Project updated successfully.")
     }
   }
-
-  console.log(members)
 
   return (
     <Card className="py-6 px-4">

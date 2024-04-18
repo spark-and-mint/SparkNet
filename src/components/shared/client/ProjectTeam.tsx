@@ -22,7 +22,7 @@ const ProjectTeam = ({ project }) => {
         <Loader />
       ) : (
         <>
-          {teamMembers && teamMembers.length < 1 ? (
+          {!teamMembers || (teamMembers && teamMembers.length === 0) ? (
             <p className="pt-5 pb-6 text-sm">No team members added yet.</p>
           ) : (
             <>

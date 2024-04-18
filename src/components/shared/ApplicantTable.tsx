@@ -97,17 +97,17 @@ const ApplicantTable = () => {
         cell: ({ row }) => {
           const member = row.original
           return (
-            <div className="flex items-center gap-2 w-[180px]">
+            <div className="flex items-center gap-2 w-[12rem]">
               <img
                 src={member?.avatarUrl}
                 alt="avatar"
                 className="w-10 h-10 rounded-full"
               />
-              <div className="flex flex-col gap-2">
-                <p className="text-sm font-medium leading-none max-w-[180px] truncate">
+              <div className="flex flex-col gap-2 w-[10rem]">
+                <p className="text-sm font-medium leading-none truncate">
                   {member?.firstName} {member?.lastName}
                 </p>
-                <p className="text-xs leading-none text-muted-foreground max-w-[180px] truncate">
+                <p className="text-xs leading-none text-muted-foreground truncate">
                   {member?.email}
                 </p>
               </div>
@@ -135,7 +135,7 @@ const ApplicantTable = () => {
         },
         cell: ({ row }) => {
           return (
-            <p className="text-xs truncate text-wrap">
+            <p className="text-xs text-wrap">
               {(row.getValue("roles") as string[]).join(", ")}
             </p>
           )

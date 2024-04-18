@@ -695,7 +695,7 @@ export async function getProjectTeam(
       })
     )
 
-    return teamMembers
+    return teamMembers || []
   } catch (error) {
     console.error("Failed to fetch project team: ", error)
     throw new Error("Error fetching project team")
