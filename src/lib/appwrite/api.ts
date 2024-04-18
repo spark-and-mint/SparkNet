@@ -3,7 +3,9 @@ import { appwriteConfig, account, databases, storage, avatars } from "./config"
 import {
   IClient,
   IMember,
+  IMilestone,
   INewClient,
+  INewMilestone,
   INewOpportunity,
   INewProject,
   IOpportunity,
@@ -591,6 +593,64 @@ export async function getMilestoneUpdates(milestoneId?: string) {
     )
 
     return milestoneUpdates
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function createMilestone(milestone: INewMilestone) {
+  try {
+    const newMilestone = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.milestoneCollectionId,
+      ID.unique(),
+      {
+        projectId: milestone.projectId,
+        title: milestone.title,
+      }
+    )
+
+    return newMilestone
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function updateMilestone(milestone: IMilestone) {
+  try {
+    const updatedMilestone = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.milestoneCollectionId,
+      milestone.milestoneId,
+      {
+        title: milestone.title,
+        status: milestone.status,
+      }
+    )
+
+    if (!updatedMilestone) {
+      throw Error
+    }
+
+    return updatedMilestone
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function deleteMilestone(milestoneId?: string) {
+  if (!milestoneId) return
+
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.milestoneCollectionId,
+      milestoneId
+    )
+
+    if (!statusCode) throw Error
+
+    return { status: "Ok", milestoneId }
   } catch (error) {
     console.log(error)
   }

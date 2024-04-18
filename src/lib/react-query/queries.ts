@@ -1,7 +1,9 @@
 import {
   IClient,
   IMember,
+  IMilestone,
   INewClient,
+  INewMilestone,
   INewOpportunity,
   INewProject,
   IOpportunity,
@@ -12,9 +14,11 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   assignMemberToClient,
   createClient,
+  createMilestone,
   createOpportunity,
   createProject,
   deleteClient,
+  deleteMilestone,
   deleteOpportunity,
   getClientById,
   getClientOpportunities,
@@ -32,6 +36,7 @@ import {
   signOutAccount,
   updateClient,
   updateMember,
+  updateMilestone,
   updateOpportunity,
   updateProject,
 } from "../appwrite/api"
@@ -264,6 +269,43 @@ export const useDeleteClient = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CLIENTS],
+      })
+    },
+  })
+}
+
+export const useCreateMilestone = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (milestone: INewMilestone) => createMilestone(milestone),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_PROJECT_MILESTONES],
+      })
+    },
+  })
+}
+
+export const useUpdateMilestone = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (milestone: IMilestone) => updateMilestone(milestone),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_PROJECT_MILESTONES],
+      })
+    },
+  })
+}
+
+export const useDeleteMilestone = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({ milestoneId }: { milestoneId?: string }) =>
+      deleteMilestone(milestoneId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_PROJECT_MILESTONES],
       })
     },
   })

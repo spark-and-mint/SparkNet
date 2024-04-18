@@ -95,3 +95,10 @@ export const OpportunityValidation = z.object({
     .string()
     .min(2, { message: "Responsibilities must be at least 2 characters." }),
 })
+
+export const MilestoneValidation = z.object({
+  title: z
+    .string()
+    .min(2, { message: "Minimum 2 characters." })
+    .max(255, { message: "Maximum 255 caracters" }),
+})

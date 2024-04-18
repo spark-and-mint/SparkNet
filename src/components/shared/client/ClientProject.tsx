@@ -24,7 +24,7 @@ const ClientProject = () => {
             <Tabs defaultValue="details">
               <TabsList className="mt-6 mb-8">
                 <TabsTrigger value="details">Project details</TabsTrigger>
-                <TabsTrigger value="status">Project status</TabsTrigger>
+                <TabsTrigger value="status">Project milestones</TabsTrigger>
                 <TabsTrigger value="team">Team members</TabsTrigger>
               </TabsList>
               <TabsContent value="details">

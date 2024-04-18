@@ -1,8 +1,36 @@
-import { CircleSlash, Pickaxe, ThumbsUp, TriangleAlert } from "lucide-react"
+import {
+  CircleSlash,
+  MoreHorizontal,
+  Pickaxe,
+  ThumbsUp,
+  TriangleAlert,
+} from "lucide-react"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Models } from "appwrite"
 import Update from "./Update"
-import { useGetMilestoneUpdates } from "@/lib/react-query/queries"
+import {
+  useDeleteMilestone,
+  useGetMilestoneUpdates,
+} from "@/lib/react-query/queries"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import { Button } from "@/components/ui"
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu"
+import { useState } from "react"
+import { useConfirm } from "../AlertDialogProvider"
+import MilestoneForm from "./project/MilestoneForm"
+import { toast } from "sonner"
 
 const getMilestoneStatus = (status: string) => {
   switch (status) {
@@ -43,6 +71,27 @@ const Milestone = ({ milestone }: { milestone: Models.Document }) => {
   const { data: updates, isPending: isPendingUpdates } = useGetMilestoneUpdates(
     milestone.$id
   )
+  const { mutateAsync: deleteMilestone } = useDeleteMilestone()
+  const confirm = useConfirm()
+  const [showEditDialog, setShowEditDialog] = useState(false)
+
+  const handleDelete = async (milestoneId: string) => {
+    const declineConfirmed = await confirm({
+      title: `Are you sure you want to delete the "${milestone?.title}" milestone and all its updates?`,
+      cancelButton: "Cancel",
+      actionButton: "Delete",
+    })
+
+    if (!declineConfirmed) return
+
+    try {
+      await deleteMilestone({ milestoneId })
+      toast.success("Milestone deleted successfully.")
+    } catch (error) {
+      toast.error("Could not delete milestone. Please try again.")
+      console.error(error)
+    }
+  }
 
   return (
     <Card className="p-2">
@@ -52,6 +101,36 @@ const Milestone = ({ milestone }: { milestone: Models.Document }) => {
             <h5 className="font-medium">{milestone.title}</h5>
             <div className="ml-4">{getMilestoneStatus(milestone.status)}</div>
           </div>
+          <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="icon">
+                  <span className="sr-only">Open menu</span>
+                  <MoreHorizontal className="h-6 w-6" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DialogTrigger asChild>
+                  <DropdownMenuItem>Edit milestone</DropdownMenuItem>
+                </DialogTrigger>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleDelete(milestone.$id)}>
+                  <span className="font-medium text-[#e40808]">Delete</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DialogContent className="sm:max-w-md">
+              <DialogHeader>
+                <DialogTitle>Edit milestone</DialogTitle>
+              </DialogHeader>
+
+              <MilestoneForm
+                action="update"
+                setOpen={setShowEditDialog}
+                milestone={milestone}
+              />
+            </DialogContent>
+          </Dialog>
         </div>
       </CardHeader>
 
@@ -61,8 +140,8 @@ const Milestone = ({ milestone }: { milestone: Models.Document }) => {
         ) : (
           <>
             {updates && updates.length === 0 ? (
-              <Card className="flex flex-col items-center justify-center h-full pt-14 pb-16">
-                <h4 className="h4 text-[1.325rem] mt-3 text-center">
+              <Card className="flex flex-col items-center justify-center h-full pt-12 pb-14">
+                <h4 className="text-[1.25rem] mt-3 text-center">
                   There are no updates added yet
                 </h4>
                 <p className="mt-2 text-muted-foreground text-center">

@@ -25,4 +25,5 @@ export enum QUERY_KEYS {
   // MILESTONE KEYS
   GET_PROJECT_MILESTONES = "getProjectMilestones",
   GET_MILESTONE_UPDATES = "getMilestoneUpdates",
+  GET_MILESTONE_BY_ID = "getMilestoneById",
 }
