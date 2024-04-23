@@ -31,8 +31,8 @@ const ClientSettings = () => {
     resolver: zodResolver(ClientValidation),
     defaultValues: {
       name: client?.name,
-      website: client?.website,
-      description: client?.description,
+      description: client?.description ?? "",
+      website: client?.website ?? "",
       x: client?.x,
       linkedin: client?.linkedin,
       file: [],

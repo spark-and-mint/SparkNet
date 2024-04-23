@@ -141,10 +141,10 @@ const Milestone = ({ milestone }: { milestone: Models.Document }) => {
           <>
             {updates && updates.length === 0 ? (
               <Card className="flex flex-col items-center justify-center h-full pt-12 pb-14">
-                <h4 className="text-[1.25rem] mt-3 text-center">
+                <h4 className="text-lg mt-3 text-center">
                   There are no updates added yet
                 </h4>
-                <p className="mt-2 text-muted-foreground text-center">
+                <p className="mt-2 text-muted-foreground text-sm text-center">
                   When updates are added by the team, they will be listed here.
                 </p>
               </Card>

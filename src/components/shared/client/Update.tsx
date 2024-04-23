@@ -49,26 +49,30 @@ const Update = ({ update }: { update: Models.Document }) => {
         <CollapsibleContent>
           <div className="px-6 pb-6">
             <dl className="divide-y divide-stroke-1">
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt className="flex items-center text-sm font-medium leading-6 text-primary">
-                  Description
-                </dt>
-                <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                  {update.description}
-                </dd>
-              </div>
-              <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                <dt className="flex items-center text-sm font-medium leading-6 text-primary">
-                  Link
-                </dt>
-                <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                  <Button asChild variant="link" className="p-0 font-medium">
-                    <Link to={update.link ?? update.fileUrl}>
-                      {update.link ?? update.fileUrl}
-                    </Link>
-                  </Button>
-                </dd>
-              </div>
+              {update.description && (
+                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="flex items-center text-sm font-medium leading-6 text-primary">
+                    Description
+                  </dt>
+                  <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
+                    {update.description}
+                  </dd>
+                </div>
+              )}
+              {update.link || update.fileUrl ? (
+                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="flex items-center text-sm font-medium leading-6 text-primary">
+                    Link
+                  </dt>
+                  <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
+                    <Button asChild variant="link" className="p-0 font-medium">
+                      <Link to={update.link ?? update.fileUrl}>
+                        {update.link ?? update.fileUrl}
+                      </Link>
+                    </Button>
+                  </dd>
+                </div>
+              ) : null}
             </dl>
           </div>
         </CollapsibleContent>
