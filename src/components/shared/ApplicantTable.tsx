@@ -12,16 +12,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, MoreHorizontal, RotateCw } from "lucide-react"
+import { ArrowUpDown, RotateCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import {
   Table,
@@ -254,34 +246,34 @@ const ApplicantTable = () => {
           )
         },
       },
-      {
-        id: "actions",
-        enableHiding: false,
-        cell: () => {
-          return (
-            <div className="flex justify-end mr-4">
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" className="h-8 w-8 p-0">
-                    <span className="sr-only">Open menu</span>
-                    <MoreHorizontal className="h-6 w-6" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem>Edit member</DropdownMenuItem>
-                  <DropdownMenuItem>View application</DropdownMenuItem>
-                  <DropdownMenuItem>View contract</DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem>
-                    <span className="font-medium text-[#e40808]">Delete</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )
-        },
-      },
+      // {
+      //   id: "actions",
+      //   enableHiding: false,
+      //   cell: () => {
+      //     return (
+      //       <div className="flex justify-end mr-4">
+      //         <DropdownMenu>
+      //           <DropdownMenuTrigger asChild>
+      //             <Button variant="ghost" className="h-8 w-8 p-0">
+      //               <span className="sr-only">Open menu</span>
+      //               <MoreHorizontal className="h-6 w-6" />
+      //             </Button>
+      //           </DropdownMenuTrigger>
+      //           <DropdownMenuContent align="end">
+      //             <DropdownMenuLabel>Actions</DropdownMenuLabel>
+      //             <DropdownMenuItem>Edit member</DropdownMenuItem>
+      //             <DropdownMenuItem>View application</DropdownMenuItem>
+      //             <DropdownMenuItem>View contract</DropdownMenuItem>
+      //             <DropdownMenuSeparator />
+      //             <DropdownMenuItem>
+      //               <span className="font-medium text-[#e40808]">Delete</span>
+      //             </DropdownMenuItem>
+      //           </DropdownMenuContent>
+      //         </DropdownMenu>
+      //       </div>
+      //     )
+      //   },
+      // },
     ],
     []
   )

@@ -16,7 +16,7 @@ const ProjectTeam = ({ project }) => {
     project?.team
   )
 
-  console.log(project.team)
+  console.log(isPending)
 
   return (
     <div>

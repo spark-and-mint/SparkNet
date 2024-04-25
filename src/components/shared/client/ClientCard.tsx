@@ -19,7 +19,7 @@ const ClientCard = ({ client }: { client: Models.Document }) => {
     <Card className="flex flex-col justify-between h-full">
       <CardHeader>
         <CardTitle>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between gap-8 leading-8">
             {client.name}
             {client.logoUrl ? (
               <img
