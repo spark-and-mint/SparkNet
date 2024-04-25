@@ -6,6 +6,7 @@ export enum QUERY_KEYS {
   GET_CURRENT_MEMBER = "getCurrentMember",
   GET_MEMBERS = "getMembers",
   GET_MEMBER_BY_ID = "getMemberById",
+  GET_MEMBER_STATUS = "getMemberStatus",
   GET_PROFILES = "getProfiles",
 
   // CLIENT KEYS

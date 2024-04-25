@@ -31,7 +31,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
 import { useGetMembers, useGetProfiles } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
@@ -39,6 +38,8 @@ import { Link } from "react-router-dom"
 
 import { RankingInfo } from "@tanstack/match-sorter-utils"
 import { fuzzyFilter, fuzzySort } from "@/lib/utils"
+import StatusSelect from "./StatusSelect"
+import MemberDialog from "@/_root/pages/MemberDialog"
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -69,6 +70,10 @@ const ApplicantTable = () => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [members, setMembers] = useState<Models.Document[]>([])
+  const [showMemberDialog, setShowMemberDialog] = useState(false)
+  const [selectedMember, setSelectedMember] = useState<null | Models.Document>(
+    null
+  )
 
   useEffect(() => {
     if (memberData && profileData) {
@@ -80,8 +85,8 @@ const ApplicantTable = () => {
           (profile) => profile.memberId === member.accountId
         )
         return {
-          ...member,
           ...profile,
+          ...member,
         }
       })
 
@@ -240,21 +245,11 @@ const ApplicantTable = () => {
           )
         },
         cell: ({ row }) => {
-          const status: string = row.getValue("status")
-          const bgColor: { [key: string]: string } = {
-            "form completed": "#feb919",
-            "1on1 done": "#2cccff",
-            accepted: "#23c05c",
-            rejected: "#e02523",
-          }
+          const member = row.original
 
           return (
             <div className="flex justify-center">
-              <Badge style={{ background: bgColor[status] }}>
-                <span className="first-letter:uppercase text-nowrap">
-                  {status}
-                </span>
-              </Badge>
+              <StatusSelect member={member} className="w-[8.25rem]" />
             </div>
           )
         },
@@ -360,21 +355,28 @@ const ApplicantTable = () => {
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  const member = row.original
+                  return (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      onClick={() => {
+                        setShowMemberDialog(true), setSelectedMember(member)
+                      }}
+                      className="cursor-pointer"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  )
+                })
               ) : (
                 <TableRow>
                   <TableCell
@@ -398,6 +400,11 @@ const ApplicantTable = () => {
           </Table>
         </div>
       </div>
+      <MemberDialog
+        open={showMemberDialog}
+        onOpenChange={setShowMemberDialog}
+        member={selectedMember}
+      />
     </>
   )
 }

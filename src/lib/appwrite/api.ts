@@ -89,7 +89,9 @@ export async function getProfiles() {
   return profiles
 }
 
-export async function getMemberById(memberId: string) {
+export async function getMemberById(memberId?: string) {
+  if (!memberId) throw Error
+
   try {
     const member = await databases.getDocument(
       appwriteConfig.databaseId,
@@ -100,6 +102,42 @@ export async function getMemberById(memberId: string) {
     if (!member) throw Error
 
     return member
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getMemberStatus(memberId?: string) {
+  if (!memberId) throw Error
+
+  try {
+    const member = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.memberCollectionId,
+      memberId
+    )
+
+    if (!member) throw Error
+
+    return member.status
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getProfileById(profileId?: string) {
+  if (!profileId) throw Error
+
+  try {
+    const profile = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.profileCollectionId,
+      profileId
+    )
+
+    if (!profile) throw Error
+
+    return profile
   } catch (error) {
     console.log(error)
   }
@@ -131,9 +169,14 @@ export async function updateMember(member: IUpdateMember) {
       appwriteConfig.memberCollectionId,
       member.memberId,
       {
+        email: member.email,
+        importedAnswers: member.importedAnswers,
+        emailVerification: member.emailVerification,
         firstName: member.firstName,
         lastName: member.lastName,
-        email: member.email,
+        status: member.status,
+        contractSigned: member.contractSigned,
+        timezone: member.timezone,
         avatarUrl: avatar.avatarUrl,
         avatarId: avatar.avatarId,
       }

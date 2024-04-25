@@ -39,6 +39,7 @@ import { Link } from "react-router-dom"
 
 import { RankingInfo } from "@tanstack/match-sorter-utils"
 import { fuzzyFilter, fuzzySort } from "@/lib/utils"
+import MemberDialog from "@/_root/pages/MemberDialog"
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -68,6 +69,10 @@ const MemberTable = () => {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({})
   const [members, setMembers] = useState<Models.Document[]>([])
+  const [showMemberDialog, setShowMemberDialog] = useState(false)
+  const [selectedMember, setSelectedMember] = useState<null | Models.Document>(
+    null
+  )
 
   useEffect(() => {
     if (memberData && profileData) {
@@ -79,8 +84,8 @@ const MemberTable = () => {
           (profile) => profile.memberId === member.accountId
         )
         return {
-          ...member,
           ...profile,
+          ...member,
         }
       })
 
@@ -346,21 +351,28 @@ const MemberTable = () => {
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
-                  <TableRow
-                    key={row.id}
-                    data-state={row.getIsSelected() && "selected"}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </TableCell>
-                    ))}
-                  </TableRow>
-                ))
+                table.getRowModel().rows.map((row) => {
+                  const member = row.original
+                  return (
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                      onClick={() => {
+                        setShowMemberDialog(true), setSelectedMember(member)
+                      }}
+                      className="cursor-pointer"
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  )
+                })
               ) : (
                 <TableRow>
                   <TableCell
@@ -384,6 +396,11 @@ const MemberTable = () => {
           </Table>
         </div>
       </div>
+      <MemberDialog
+        open={showMemberDialog}
+        onOpenChange={setShowMemberDialog}
+        member={selectedMember}
+      />
     </>
   )
 }

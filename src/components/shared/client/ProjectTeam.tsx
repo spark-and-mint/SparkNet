@@ -16,6 +16,8 @@ const ProjectTeam = ({ project }) => {
     project?.team
   )
 
+  console.log(project.team)
+
   return (
     <div>
       {isPending ? (

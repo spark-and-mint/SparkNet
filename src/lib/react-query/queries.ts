@@ -25,9 +25,11 @@ import {
   getClientProjects,
   getClients,
   getMemberById,
+  getMemberStatus,
   getMembers,
   getMilestoneUpdates,
   getOpportunityById,
+  getProfileById,
   getProfiles,
   getProjectById,
   getProjectMilestones,
@@ -172,11 +174,27 @@ export const useSignOutAccount = () => {
   })
 }
 
-export const useGetMemberById = (memberId: string) => {
+export const useGetMemberById = (memberId?: string) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_MEMBER_BY_ID, memberId],
     queryFn: () => getMemberById(memberId),
     enabled: !!memberId,
+  })
+}
+
+export const useGetMemberStatus = (memberId?: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_MEMBER_STATUS, memberId],
+    queryFn: () => getMemberStatus(memberId),
+    enabled: false,
+  })
+}
+
+export const useGetProfileById = (profileId?: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_MEMBER_BY_ID, profileId],
+    queryFn: () => getProfileById(profileId),
+    enabled: !!profileId,
   })
 }
 
@@ -185,6 +203,12 @@ export const useUpdateMember = () => {
   return useMutation({
     mutationFn: (member: IUpdateMember) => updateMember(member),
     onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_MEMBERS],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_MEMBER_STATUS, data?.$id],
+      })
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CURRENT_MEMBER],
       })
