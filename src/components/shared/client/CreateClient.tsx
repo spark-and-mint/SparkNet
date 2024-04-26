@@ -80,7 +80,7 @@ const CreateClient = () => {
                     <Label>Logo</Label>
                     <Input
                       type="file"
-                      className="col-span-3 cursor-pointer"
+                      className="col-span-3 cursor-pointer file:cursor-pointer"
                       {...fileRef}
                     />
                   </div>

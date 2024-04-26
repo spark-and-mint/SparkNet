@@ -66,19 +66,19 @@ const Opportunity = ({ client, opportunity }) => {
 
   const handleDelete = async (opportunityId: string) => {
     const deleteConfirmed = await confirm({
-      title: `Deleting opportunity`,
+      title: `Removing member from team`,
       body: "Are you sure you want to do that?",
       cancelButton: "Cancel",
-      actionButton: "Delete",
+      actionButton: "Remove",
     })
 
     if (!deleteConfirmed) return
 
     try {
       await deleteOpportunity({ opportunityId, clientId: client.$id })
-      toast.success("Opportunity deleted successfully.")
+      toast.success("Member removed successfully.")
     } catch (error) {
-      toast.error("Could not delete opportunity.")
+      toast.error("Could not remove member. Please try again.")
       console.error({ error })
     }
   }
