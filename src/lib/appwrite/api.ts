@@ -699,12 +699,8 @@ export async function deleteMilestone(milestoneId?: string) {
   }
 }
 
-export async function getProjectTeam(
-  projectId?: string,
-  memberIds: string[] = []
-) {
-  if (!projectId || !memberIds.length)
-    throw Error("Invalid project ID or member IDs")
+export async function getProjectTeam(projectId?: string) {
+  if (!projectId) throw Error("Invalid project ID or member IDs")
 
   try {
     const opportunities = await databases.listDocuments(
@@ -713,32 +709,29 @@ export async function getProjectTeam(
       [Query.equal("projectId", projectId)]
     )
 
-    const memberRoles = opportunities.documents.reduce((acc, doc) => {
-      if (memberIds.includes(doc.memberId)) {
-        acc[doc.memberId] = doc.role
-      }
-      return acc
-    }, {})
+    const acceptedOpportunities = opportunities.documents.filter(
+      (opportunity) => opportunity.status === "accepted"
+    )
 
     const teamMembers = await Promise.all(
-      memberIds.map(async (memberId) => {
+      acceptedOpportunities.map(async (opportunity) => {
         const memberDetails = await databases.getDocument(
           appwriteConfig.databaseId,
           appwriteConfig.memberCollectionId,
-          memberId
+          opportunity.memberId
         )
 
         return {
-          id: memberId,
+          id: opportunity.memberId,
           firstName: memberDetails.firstName,
           lastName: memberDetails.lastName,
           avatarUrl: memberDetails.avatarUrl,
-          role: memberRoles[memberId] || "Team member",
+          role: opportunity.role || "Team member",
         }
       })
     )
 
-    return teamMembers || []
+    return teamMembers
   } catch (error) {
     console.error("Failed to fetch project team: ", error)
     throw new Error("Error fetching project team")

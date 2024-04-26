@@ -11,10 +11,6 @@
     @media screen and (min-width: 1600px) {
       font-size: 20px;
     }
-
-    @media screen and (min-width: 2600px) {
-      font-size: 24px;
-    }
   }
 
   :root {

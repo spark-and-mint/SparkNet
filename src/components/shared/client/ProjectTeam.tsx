@@ -11,12 +11,7 @@ interface TeamMember {
 }
 
 const ProjectTeam = ({ project }) => {
-  const { data: teamMembers, isPending } = useGetProjectTeam(
-    project?.$id,
-    project?.team
-  )
-
-  console.log(isPending)
+  const { data: teamMembers, isPending } = useGetProjectTeam(project?.$id)
 
   return (
     <div>

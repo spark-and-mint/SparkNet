@@ -33,8 +33,8 @@ const ClientSettings = () => {
       name: client?.name,
       description: client?.description ?? "",
       website: client?.website ?? "",
-      x: client?.x,
-      linkedin: client?.linkedin,
+      x: client?.x ?? "",
+      linkedin: client?.linkedin ?? "",
       file: [],
     },
   })

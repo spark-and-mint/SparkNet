@@ -351,10 +351,10 @@ export const useGetMilestoneUpdates = (milestoneId?: string) => {
   })
 }
 
-export const useGetProjectTeam = (projectId?: string, memberIds?: string[]) => {
+export const useGetProjectTeam = (projectId?: string) => {
   return useQuery({
-    queryKey: [QUERY_KEYS.GET_PROJECT_TEAM, memberIds],
-    queryFn: () => getProjectTeam(projectId, memberIds),
-    enabled: !!memberIds,
+    queryKey: [QUERY_KEYS.GET_PROJECT_TEAM, projectId],
+    queryFn: () => getProjectTeam(projectId),
+    enabled: !!projectId,
   })
 }

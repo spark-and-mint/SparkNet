@@ -129,7 +129,9 @@ const Opportunity = ({ client, opportunity }) => {
                   <DropdownMenuItem
                     onClick={() => handleDelete(opportunity.$id)}
                   >
-                    <span className="font-medium text-[#e40808]">Delete</span>
+                    <span className="font-medium text-[#e40808]">
+                      Remove from team
+                    </span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
