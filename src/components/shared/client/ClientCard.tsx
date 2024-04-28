@@ -6,7 +6,6 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from "../../ui/button"
-import { Avatar, AvatarFallback } from "../../ui/avatar"
 import { Link } from "react-router-dom"
 import { Models } from "appwrite"
 import { useGetClientProjects } from "@/lib/react-query/queries"
@@ -21,20 +20,10 @@ const ClientCard = ({ client }: { client: Models.Document }) => {
         <CardTitle>
           <div className="flex items-center justify-between gap-8 leading-8">
             {client.name}
-            {client.logoUrl ? (
-              <img
-                src={client.logoUrl}
-                className="w-14 h-14 ring-1 ring-gray-300 rounded-full"
-              />
-            ) : (
-              <Avatar>
-                <AvatarFallback>
-                  <span className="text-sm uppercase">
-                    {client.name.substring(0, 2)}
-                  </span>
-                </AvatarFallback>
-              </Avatar>
-            )}
+            <img
+              src={client.logoUrl}
+              className="shrink-0 w-14 h-14 ring-1 ring-gray-300 rounded-full"
+            />
           </div>
         </CardTitle>
       </CardHeader>

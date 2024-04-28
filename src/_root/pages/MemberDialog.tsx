@@ -138,12 +138,8 @@ const MemberDialog = ({ member, open, onOpenChange }: MemberDialogProps) => {
                     <dt className="text-sm font-medium leading-6 text-primary">
                       Website
                     </dt>
-                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                      <Button
-                        asChild
-                        variant="link"
-                        className="p-0 font-medium h-0"
-                      >
+                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 truncate">
+                      <Button asChild variant="link" className="p-0 h-0">
                         <Link to={member.website} target="_blank">
                           {member.website}
                         </Link>
@@ -156,12 +152,8 @@ const MemberDialog = ({ member, open, onOpenChange }: MemberDialogProps) => {
                     <dt className="text-sm font-medium leading-6 text-primary">
                       LinkedIn
                     </dt>
-                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                      <Button
-                        asChild
-                        variant="link"
-                        className="p-0 font-medium h-0"
-                      >
+                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 truncate">
+                      <Button asChild variant="link" className="p-0 h-0">
                         <Link to={member.linkedin} target="_blank">
                           {member.linkedin}
                         </Link>
@@ -174,12 +166,8 @@ const MemberDialog = ({ member, open, onOpenChange }: MemberDialogProps) => {
                     <dt className="text-sm font-medium leading-6 text-primary">
                       GitHub
                     </dt>
-                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                      <Button
-                        asChild
-                        variant="link"
-                        className="p-0 font-medium h-0"
-                      >
+                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 truncate">
+                      <Button asChild variant="link" className="p-0 h-0">
                         <Link to={member.github} target="_blank">
                           {member.github}
                         </Link>
@@ -192,12 +180,8 @@ const MemberDialog = ({ member, open, onOpenChange }: MemberDialogProps) => {
                     <dt className="text-sm font-medium leading-6 text-primary">
                       X
                     </dt>
-                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                      <Button
-                        asChild
-                        variant="link"
-                        className="p-0 font-medium"
-                      >
+                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 truncate">
+                      <Button asChild variant="link" className="p-0 h-0">
                         <Link to={member.x} target="_blank">
                           {member.x}
                         </Link>
@@ -210,12 +194,8 @@ const MemberDialog = ({ member, open, onOpenChange }: MemberDialogProps) => {
                     <dt className="text-sm font-medium leading-6 text-primary">
                       Farcaster
                     </dt>
-                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                      <Button
-                        asChild
-                        variant="link"
-                        className="p-0 font-medium"
-                      >
+                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 truncate">
+                      <Button asChild variant="link" className="p-0 h-0">
                         <Link to={member.farcaster} target="_blank">
                           {member.farcaster}
                         </Link>
@@ -228,12 +208,8 @@ const MemberDialog = ({ member, open, onOpenChange }: MemberDialogProps) => {
                     <dt className="text-sm font-medium leading-6 text-primary">
                       Dribbble
                     </dt>
-                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                      <Button
-                        asChild
-                        variant="link"
-                        className="p-0 font-medium"
-                      >
+                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 truncate">
+                      <Button asChild variant="link" className="p-0 h-0">
                         <Link to={member.dribbble} target="_blank">
                           {member.dribbble}
                         </Link>
@@ -246,12 +222,8 @@ const MemberDialog = ({ member, open, onOpenChange }: MemberDialogProps) => {
                     <dt className="text-sm font-medium leading-6 text-primary">
                       Behance
                     </dt>
-                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
-                      <Button
-                        asChild
-                        variant="link"
-                        className="p-0 font-medium"
-                      >
+                    <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0 truncate">
+                      <Button asChild variant="link" className="p-0 h-0">
                         <Link to={member.behance} target="_blank">
                           {member.behance}
                         </Link>
