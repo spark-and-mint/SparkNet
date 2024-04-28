@@ -44,6 +44,10 @@ export async function getCurrentMember() {
     if (!currentMember || currentMember.documents.length === 0)
       throw new Error("Member not found.")
 
+    if (currentMember.documents[0].role !== "admin") {
+      throw new Error("Unauthorized access.")
+    }
+
     const profile = await databases.getDocument(
       appwriteConfig.databaseId,
       appwriteConfig.profileCollectionId,
