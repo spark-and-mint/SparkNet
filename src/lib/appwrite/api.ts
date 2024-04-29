@@ -459,6 +459,7 @@ export async function updateProject(project: IProject) {
         sparkRep: project.sparkRep,
         briefLink: project.briefLink,
         roadmapLink: project.roadmapLink,
+        status: project.status,
       }
     )
 

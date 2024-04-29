@@ -64,6 +64,7 @@ export const ProjectValidation = z.object({
     .url({ message: "Invalid url. Please add https." })
     .optional()
     .or(z.literal("")),
+  status: z.string().optional(),
 })
 
 export const ProfileValidation = z.object({

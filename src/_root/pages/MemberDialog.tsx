@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button"
 import { Link } from "react-router-dom"
-import StatusSelect from "@/components/shared/StatusSelect"
+import StatusSelect from "@/components/shared/MemberStatusSelect"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Dialog, DialogContent, DialogHeader } from "@/components/ui/dialog"
 import { Models } from "appwrite"

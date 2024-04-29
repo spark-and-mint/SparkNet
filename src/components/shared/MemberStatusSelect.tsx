@@ -10,12 +10,12 @@ import { useGetMemberStatus, useUpdateMember } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
 import { toast } from "sonner"
 
-interface StatusSelectProps {
+interface MemberStatusSelectProps {
   member: Models.Document
   className?: string
 }
 
-const StatusSelect = ({ member, className }: StatusSelectProps) => {
+const MemberStatusSelect = ({ member, className }: MemberStatusSelectProps) => {
   const { mutateAsync: updateMember, isPending } = useUpdateMember()
   const { data: memberStatus, refetch } = useGetMemberStatus(member.$id)
 
@@ -89,4 +89,4 @@ const StatusSelect = ({ member, className }: StatusSelectProps) => {
   )
 }
 
-export default StatusSelect
+export default MemberStatusSelect

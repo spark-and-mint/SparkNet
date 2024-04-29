@@ -30,7 +30,7 @@ import { Link } from "react-router-dom"
 
 import { RankingInfo } from "@tanstack/match-sorter-utils"
 import { fuzzyFilter, fuzzySort } from "@/lib/utils"
-import StatusSelect from "./StatusSelect"
+import MemberStatusSelect from "./MemberStatusSelect"
 import MemberDialog from "@/_root/pages/MemberDialog"
 
 declare module "@tanstack/table-core" {
@@ -100,11 +100,11 @@ const ApplicantTable = () => {
                 alt="avatar"
                 className="w-10 h-10 rounded-full"
               />
-              <div className="flex flex-col gap-2 w-[10rem]">
-                <p className="text-sm font-medium leading-none truncate">
+              <div className="flex flex-col w-[10rem]">
+                <p className="py-1 text-sm font-medium leading-none truncate">
                   {member?.firstName} {member?.lastName}
                 </p>
-                <p className="text-xs leading-none text-muted-foreground truncate">
+                <p className=" py-1 text-xs leading-none text-muted-foreground truncate">
                   {member?.email}
                 </p>
               </div>
@@ -241,7 +241,7 @@ const ApplicantTable = () => {
 
           return (
             <div className="flex justify-center">
-              <StatusSelect member={member} className="w-[8.25rem]" />
+              <MemberStatusSelect member={member} className="w-[8.25rem]" />
             </div>
           )
         },

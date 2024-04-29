@@ -22,6 +22,7 @@ import {
   SelectValue,
   SelectContent,
   SelectItem,
+  SelectGroup,
 } from "@/components/ui/select"
 import { useGetMembers, useUpdateProject } from "@/lib/react-query/queries"
 import { ProjectValidation } from "@/lib/validation"
@@ -41,6 +42,7 @@ const ProjectDetails = ({ project }) => {
       sparkRep: project.sparkRep?.$id ?? "",
       briefLink: project.briefLink ?? "",
       roadmapLink: project.roadmapLink ?? "",
+      status: project.status ?? "",
     },
   })
 
@@ -53,6 +55,7 @@ const ProjectDetails = ({ project }) => {
       sparkRep: values.sparkRep,
       briefLink: values.briefLink,
       roadmapLink: values.roadmapLink,
+      status: values.status,
     })
 
     if (!updatedProject) {
@@ -143,6 +146,54 @@ const ProjectDetails = ({ project }) => {
                       {...field}
                       placeholder="https://page.notion.site/document"
                     />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-12">
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <Label>Project status</Label>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select a status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          <SelectItem value="kickoff">
+                            <div className="flex items-center">
+                              <span className="mr-2 text-2xl text-blue-400">
+                                •
+                              </span>
+                              Kickoff
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="in progress">
+                            <div className="flex items-center">
+                              <span className="mr-2 text-2xl text-yellow-500">
+                                •
+                              </span>
+                              In progress
+                            </div>
+                          </SelectItem>
+                          <SelectItem value="completed">
+                            <div className="flex items-center">
+                              <span className="mr-2 text-2xl text-green-500">
+                                •
+                              </span>
+                              Completed
+                            </div>
+                          </SelectItem>
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
                   </FormItem>
                 )}
               />

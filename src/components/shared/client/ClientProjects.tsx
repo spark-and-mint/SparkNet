@@ -12,6 +12,12 @@ const ClientProjects = () => {
 
   const getProjectStatus = (status: string) => {
     switch (status) {
+      case "kickoff":
+        return (
+          <span className="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2 py-0.5 rounded  border border-blue-300">
+            Kickoff
+          </span>
+        )
       case "in progress":
         return (
           <span className="bg-yellow-100 text-yellow-800 text-xs font-medium me-2 px-2 py-0.5 rounded  border border-yellow-300">
