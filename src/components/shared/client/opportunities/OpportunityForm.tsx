@@ -26,8 +26,16 @@ import {
   useGetMembers,
   useUpdateOpportunity,
 } from "@/lib/react-query/queries"
-import { RotateCw } from "lucide-react"
+import { CalendarIcon, RotateCw } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { cn } from "@/lib/utils"
+import { format } from "date-fns"
+import { Calendar } from "@/components/ui/calendar"
 
 type OpportunityFormProps = {
   opportunity?: Models.Document
@@ -52,6 +60,9 @@ const OpportunityForm = ({
       projectId: opportunity?.projectId ?? "",
       memberId: opportunity?.memberId ?? "",
       role: opportunity?.role ?? "",
+      startDate: opportunity?.startDate
+        ? new Date(opportunity.startDate)
+        : undefined,
       background: opportunity?.background ?? "",
       description: opportunity?.description ?? "",
       duration: opportunity?.duration ?? "",
@@ -224,6 +235,49 @@ const OpportunityForm = ({
 
               <FormField
                 control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col justify-end">
+                    <FormLabel>Estimated start date (optional)</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="px-8">
+            <div className="space-y-8">
+              <FormField
+                control={form.control}
                 name="estimatedEarnings"
                 defaultValue={opportunity?.estimatedEarnings}
                 render={({ field }) => (
@@ -240,11 +294,7 @@ const OpportunityForm = ({
                   </FormItem>
                 )}
               />
-            </div>
-          </div>
 
-          <div className="px-8">
-            <div className="space-y-8">
               <FormField
                 control={form.control}
                 name="background"

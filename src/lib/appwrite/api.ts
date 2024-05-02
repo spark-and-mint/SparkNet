@@ -521,6 +521,7 @@ export async function createOpportunity(opportunity: INewOpportunity) {
         memberId: opportunity.memberId,
         status: opportunity.status,
         role: opportunity.role,
+        startDate: opportunity.startDate?.toISOString(),
         background: opportunity.background,
         description: opportunity.description,
         duration: opportunity.duration,
@@ -545,6 +546,7 @@ export async function updateOpportunity(opportunity: IOpportunity) {
       {
         status: opportunity.status,
         role: opportunity.role,
+        startDate: opportunity.startDate?.toISOString(),
         background: opportunity.background,
         description: opportunity.description,
         duration: opportunity.duration,

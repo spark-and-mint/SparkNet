@@ -126,6 +126,7 @@ export type INewOpportunity = {
   memberId: string
   status: string
   role: string
+  startDate?: Date
   background?: string
   description: string
   duration: string
@@ -138,6 +139,7 @@ export type IOpportunity = {
   opportunityId: string
   status?: string
   role?: string
+  startDate?: Date
   background?: string
   description?: string
   duration?: string

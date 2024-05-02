@@ -89,6 +89,7 @@ export const OpportunityValidation = z.object({
     required_error: "Please select a member.",
   }),
   role: z.string().min(2, { message: "Role must be at least 2 characters." }),
+  startDate: z.date().optional(),
   background: z.string().optional(),
   description: z
     .string()
