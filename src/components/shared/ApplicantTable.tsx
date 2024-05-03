@@ -259,14 +259,7 @@ const ApplicantTable = () => {
     filterFns: {
       fuzzy: fuzzyFilter,
     },
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnFilters,

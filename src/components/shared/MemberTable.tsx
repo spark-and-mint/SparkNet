@@ -115,25 +115,13 @@ const MemberTable = () => {
       },
       {
         accessorKey: "roles",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="-ml-4"
-            >
-              Roles
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
+        header: "Roles",
         cell: ({ row }) => {
+          const roles = row.getValue("roles") as string[]
           return (
             <div className="max-w-[12rem]">
               <p className="text-xs truncate text-wrap">
-                {(row.getValue("roles") as string[]).join(", ")}
+                {roles && roles.length > 0 && roles.join(", ")}
               </p>
             </div>
           )
@@ -143,25 +131,13 @@ const MemberTable = () => {
       },
       {
         accessorKey: "skills",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="-ml-4"
-            >
-              Skills
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
+        header: "Skills",
         cell: ({ row }) => {
+          const skills = row.getValue("skills") as string[]
           return (
             <div className="max-w-[12rem]">
-              <p className="text-xs text-wrap">
-                {(row.getValue("skills") as string[]).join(", ")}
+              <p className="text-xs truncate text-wrap">
+                {skills && skills.length > 0 && skills.join(", ")}
               </p>
             </div>
           )
@@ -171,25 +147,13 @@ const MemberTable = () => {
       },
       {
         accessorKey: "domains",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="-ml-4"
-            >
-              Industries
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
+        header: "Industries",
         cell: ({ row }) => {
+          const domains = row.getValue("domains") as string[]
           return (
             <div className="max-w-[12rem]">
-              <p className="text-xs text-wrap">
-                {(row.getValue("domains") as string[]).join(", ")}
+              <p className="text-xs truncate text-wrap">
+                {domains && domains.length > 0 && domains.join(", ")}
               </p>
             </div>
           )
@@ -252,14 +216,8 @@ const MemberTable = () => {
     filterFns: {
       fuzzy: fuzzyFilter,
     },
-    onColumnFiltersChange: setColumnFilters,
-    onGlobalFilterChange: setGlobalFilter,
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    onColumnVisibilityChange: setColumnVisibility,
+
     state: {
       sorting,
       columnFilters,
@@ -280,6 +238,9 @@ const MemberTable = () => {
       </div>
     )
   }
+
+  console.log(members)
+  console.log(table.getRowModel().rows)
 
   return (
     <>
