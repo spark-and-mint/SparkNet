@@ -1,18 +1,12 @@
 import * as React from "react"
 import {
   ColumnDef,
-  ColumnFiltersState,
   FilterFn,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, RotateCw } from "lucide-react"
+import { RotateCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -53,13 +47,7 @@ const MemberTable = () => {
     isError: isErrorProfiles,
     isPending: isLoadingProfiles,
   } = useGetProfiles()
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
   const [globalFilter, setGlobalFilter] = React.useState("")
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
   const [members, setMembers] = useState<Models.Document[]>([])
   const [showMemberDialog, setShowMemberDialog] = useState(false)
   const [selectedMember, setSelectedMember] = useState<null | Models.Document>(
@@ -163,23 +151,10 @@ const MemberTable = () => {
       },
       {
         accessorKey: "seniority",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="-ml-4"
-            >
-              Seniority
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
+        header: () => <div className="text-center">Seniority</div>,
         cell: ({ row }) => {
           return (
-            <div className="capitalize text-sm">
+            <div className="text-center capitalize text-sm">
               {row.getValue("seniority")}
             </div>
           )
@@ -217,11 +192,7 @@ const MemberTable = () => {
       fuzzy: fuzzyFilter,
     },
     getCoreRowModel: getCoreRowModel(),
-
     state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
       globalFilter,
     },
   })
@@ -250,6 +221,7 @@ const MemberTable = () => {
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search..."
+            disabled
           />
           {members.length > 0 && <p>Total members: {members.length}</p>}
         </div>

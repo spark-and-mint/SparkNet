@@ -1,18 +1,12 @@
 import * as React from "react"
 import {
   ColumnDef,
-  ColumnFiltersState,
   FilterFn,
-  SortingState,
-  VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { ArrowUpDown, RotateCw } from "lucide-react"
+import { RotateCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -54,13 +48,7 @@ const ApplicantTable = () => {
     isPending: isLoadingProfiles,
   } = useGetProfiles()
 
-  const [sorting, setSorting] = React.useState<SortingState>([])
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-    []
-  )
   const [globalFilter, setGlobalFilter] = React.useState("")
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({})
   const [members, setMembers] = useState<Models.Document[]>([])
   const [showMemberDialog, setShowMemberDialog] = useState(false)
   const [selectedMember, setSelectedMember] = useState<null | Models.Document>(
@@ -116,20 +104,7 @@ const ApplicantTable = () => {
       },
       {
         accessorKey: "roles",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="-ml-4"
-            >
-              Roles
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
+        header: "Roles",
         cell: ({ row }) => {
           const roles = row.getValue("roles") as string[]
           return (
@@ -143,20 +118,7 @@ const ApplicantTable = () => {
       },
       {
         accessorKey: "skills",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="-ml-4"
-            >
-              Skills
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
+        header: "Skills",
         cell: ({ row }) => {
           const skills = row.getValue("skills") as string[]
           return (
@@ -170,20 +132,7 @@ const ApplicantTable = () => {
       },
       {
         accessorKey: "domains",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="-ml-4"
-            >
-              Industries
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
+        header: "Industries",
         cell: ({ row }) => {
           const domains = row.getValue("domains") as string[]
           return (
@@ -197,23 +146,24 @@ const ApplicantTable = () => {
       },
       {
         accessorKey: "seniority",
-        header: ({ column }) => {
-          return (
-            <Button
-              variant="ghost"
-              onClick={() =>
-                column.toggleSorting(column.getIsSorted() === "asc")
-              }
-              className="-ml-4"
-            >
-              Seniority
-              <ArrowUpDown className="ml-2 h-4 w-4" />
-            </Button>
-          )
-        },
+        header: "Seniortiy",
+        // header: ({ column }) => {
+        //   return (
+        //     <Button
+        //       variant="ghost"
+        //       onClick={() =>
+        //         column.toggleSorting(column.getIsSorted() === "asc")
+        //       }
+        //       className="-ml-4"
+        //     >
+        //       Seniority
+        //       <ArrowUpDown className="ml-2 h-4 w-4" />
+        //     </Button>
+        //   )
+        // },
         cell: ({ row }) => {
           return (
-            <div className="capitalize text-sm">
+            <div className="text-center capitalize text-sm">
               {row.getValue("seniority")}
             </div>
           )
@@ -223,22 +173,7 @@ const ApplicantTable = () => {
       },
       {
         accessorKey: "status",
-        header: ({ column }) => {
-          return (
-            <div className="flex justify-center">
-              <Button
-                variant="ghost"
-                onClick={() =>
-                  column.toggleSorting(column.getIsSorted() === "asc")
-                }
-                className="-ml-4"
-              >
-                Status
-                <ArrowUpDown className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          )
-        },
+        header: () => <div className="text-center">Status</div>,
         cell: ({ row }) => {
           const member = row.original
 
@@ -261,9 +196,6 @@ const ApplicantTable = () => {
     },
     getCoreRowModel: getCoreRowModel(),
     state: {
-      sorting,
-      columnFilters,
-      columnVisibility,
       globalFilter,
     },
   })
@@ -289,6 +221,7 @@ const ApplicantTable = () => {
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
             placeholder="Search..."
+            disabled
           />
           {members.length > 0 && <p>Total applicants: {members.length}</p>}
         </div>
