@@ -91,7 +91,8 @@ export async function signOutAccount() {
 export async function getMembers() {
   const members = await databases.listDocuments(
     appwriteConfig.databaseId,
-    appwriteConfig.memberCollectionId
+    appwriteConfig.memberCollectionId,
+    [Query.limit(100), Query.orderDesc("$createdAt")]
   )
 
   if (!members) throw Error
@@ -102,7 +103,8 @@ export async function getMembers() {
 export async function getProfiles() {
   const profiles = await databases.listDocuments(
     appwriteConfig.databaseId,
-    appwriteConfig.profileCollectionId
+    appwriteConfig.profileCollectionId,
+    [Query.limit(100), Query.orderDesc("$createdAt")]
   )
 
   if (!profiles) throw Error
