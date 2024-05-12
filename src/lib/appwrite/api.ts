@@ -10,6 +10,7 @@ import {
   INewProject,
   IOpportunity,
   IProject,
+  IRequest,
   IUpdateMember,
 } from "@/types"
 import { nanoid } from "nanoid"
@@ -86,6 +87,30 @@ export async function signOutAccount() {
   } catch (error) {
     console.log(error)
   }
+}
+
+export async function getRequests() {
+  const requests = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.requestCollectionId,
+    [Query.limit(100), Query.orderDesc("$createdAt")]
+  )
+
+  if (!requests) throw Error
+
+  return requests
+}
+
+export async function getStakeholders() {
+  const stakeholders = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.stakeholderCollectionId,
+    [Query.limit(100), Query.orderDesc("$createdAt")]
+  )
+
+  if (!stakeholders) throw Error
+
+  return stakeholders
 }
 
 export async function getMembers() {
@@ -761,5 +786,44 @@ export async function getProjectTeam(projectId?: string) {
   } catch (error) {
     console.error("Failed to fetch project team: ", error)
     throw new Error("Error fetching project team")
+  }
+}
+
+export async function getRequestStatus(requestId?: string) {
+  if (!requestId) throw Error
+
+  try {
+    const request = await databases.getDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.requestCollectionId,
+      requestId
+    )
+
+    if (!request) throw Error
+
+    return request.status
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function updateRequest(request: IRequest) {
+  try {
+    const updatedRequest = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.requestCollectionId,
+      request.requestId,
+      {
+        status: request.status,
+      }
+    )
+
+    if (!updatedRequest) {
+      throw Error
+    }
+
+    return updatedRequest
+  } catch (error) {
+    console.log(error)
   }
 }

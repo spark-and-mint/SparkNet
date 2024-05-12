@@ -178,3 +178,8 @@ export type IUpdate = {
   description?: string
   feedback?: string
 }
+
+export type IRequest = {
+  requestId: string
+  status: string
+}

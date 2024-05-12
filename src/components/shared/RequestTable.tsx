@@ -17,15 +17,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
-import { useGetMembers, useGetProfiles } from "@/lib/react-query/queries"
+import { useGetRequests, useGetStakeholders } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
 import { Link } from "react-router-dom"
 
 import { RankingInfo } from "@tanstack/match-sorter-utils"
 import { fuzzyFilter, fuzzySort } from "@/lib/utils"
-import MemberDialog from "@/_root/pages/MemberDialog"
+import RequestDialog from "@/_root/pages/RequestDialog"
+import RequestStatusSelect from "./RequestStatusSelect"
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -36,63 +36,60 @@ declare module "@tanstack/table-core" {
   }
 }
 
-const MemberTable = () => {
+const ApplicantTable = () => {
   const {
-    data: memberData,
-    isError: isErrorMembers,
-    isPending: isLoadingMembers,
-  } = useGetMembers()
+    data: stakeholderData,
+    isError: isErrorStakeholders,
+    isPending: isLoadingStakeholders,
+  } = useGetStakeholders()
   const {
-    data: profileData,
-    isError: isErrorProfiles,
-    isPending: isLoadingProfiles,
-  } = useGetProfiles()
+    data: requestData,
+    isError: isErrorRequests,
+    isPending: isLoadingRequests,
+  } = useGetRequests()
+
   const [globalFilter, setGlobalFilter] = React.useState("")
-  const [members, setMembers] = useState<Models.Document[]>([])
-  const [showMemberDialog, setShowMemberDialog] = useState(false)
-  const [selectedMember, setSelectedMember] = useState<null | Models.Document>(
-    null
-  )
+  const [requests, setRequests] = useState<Models.Document[]>([])
+  const [showRequestDialog, setShowRequestDialog] = useState(false)
+  const [selectedRequest, setSelectedRequest] =
+    useState<null | Models.Document>(null)
 
   useEffect(() => {
-    if (memberData && profileData) {
-      const acceptedMembers = memberData.documents.filter(
-        (member) => member.status === "accepted"
-      )
-      const mergedMemberData = acceptedMembers.map((member) => {
-        const profile = profileData.documents.find(
-          (profile) => profile.memberId === member.accountId
+    if (stakeholderData && requestData) {
+      const mergedRequestData = requestData.documents.map((request) => {
+        const stakeholder = stakeholderData.documents.find(
+          (stakeholder) => stakeholder.$id === request.stakeholderId
         )
         return {
-          ...profile,
-          ...member,
+          ...stakeholder,
+          ...request,
         }
       })
 
-      setMembers(mergedMemberData)
+      setRequests(mergedRequestData)
     }
-  }, [memberData, profileData])
+  }, [stakeholderData, requestData])
 
   const columns = React.useMemo<ColumnDef<Models.Document>[]>(
     () => [
       {
         accessorKey: "name",
-        header: "Member",
+        header: "Name",
         cell: ({ row }) => {
-          const member = row.original
+          const stakeholder = row.original
           return (
             <div className="flex items-center gap-2 w-[12rem]">
               <img
-                src={member?.avatarUrl}
+                src={stakeholder?.avatarUrl}
                 alt="avatar"
                 className="w-10 h-10 rounded-full"
               />
               <div className="flex flex-col w-[10rem]">
                 <p className="py-1 text-sm font-medium leading-none truncate">
-                  {member?.firstName} {member?.lastName}
+                  {stakeholder?.firstName} {stakeholder?.lastName}
                 </p>
-                <p className="py-1 text-xs leading-none text-muted-foreground truncate">
-                  {member?.email}
+                <p className=" py-1 text-xs leading-none text-muted-foreground truncate">
+                  {stakeholder?.email}
                 </p>
               </div>
             </div>
@@ -102,81 +99,51 @@ const MemberTable = () => {
         sortingFn: fuzzySort,
       },
       {
-        accessorKey: "roles",
-        header: "Roles",
+        accessorKey: "company",
+        header: "Company",
         cell: ({ row }) => {
-          const roles = row.getValue("roles") as string[]
           return (
-            <div className="max-w-[12rem]">
-              <p className="text-xs truncate text-wrap">
-                {roles && roles.length > 0 && roles.join(", ")}
-              </p>
+            <div className="capitalize text-sm">{row.getValue("company")}</div>
+          )
+        },
+      },
+      {
+        accessorKey: "industry",
+        header: "Industry",
+        cell: ({ row }) => {
+          return (
+            <div className="capitalize text-sm">{row.getValue("industry")}</div>
+          )
+        },
+      },
+      {
+        accessorKey: "goal",
+        header: "Goal",
+        cell: ({ row }) => {
+          return (
+            <div className="capitalize text-sm">{row.getValue("goal")}</div>
+          )
+        },
+      },
+      {
+        accessorKey: "timeFrame",
+        header: "Time Frame",
+        cell: ({ row }) => {
+          return (
+            <div className="capitalize text-sm">
+              {row.getValue("timeFrame")}
             </div>
           )
         },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
       },
       {
-        accessorKey: "skills",
-        header: "Skills",
+        accessorKey: "status",
+        header: () => <div className="text-center">Status</div>,
         cell: ({ row }) => {
-          const skills = row.getValue("skills") as string[]
-          return (
-            <div className="max-w-[12rem]">
-              <p className="text-xs truncate text-wrap">
-                {skills && skills.length > 0 && skills.join(", ")}
-              </p>
-            </div>
-          )
-        },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
-      },
-      {
-        accessorKey: "domains",
-        header: "Industries",
-        cell: ({ row }) => {
-          const domains = row.getValue("domains") as string[]
-          return (
-            <div className="max-w-[12rem]">
-              <p className="text-xs truncate text-wrap">
-                {domains && domains.length > 0 && domains.join(", ")}
-              </p>
-            </div>
-          )
-        },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
-      },
-      {
-        accessorKey: "seniority",
-        header: () => <div className="text-center">Seniority</div>,
-        cell: ({ row }) => {
-          return (
-            <div className="text-center capitalize text-sm">
-              {row.getValue("seniority")}
-            </div>
-          )
-        },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
-      },
-      {
-        accessorKey: "contractSigned",
-        header: () => (
-          <div className="text-center text-nowrap">Contract signed</div>
-        ),
-        cell: ({ row }) => {
-          const signed = row.getValue("contractSigned")
+          const request = row.original
           return (
             <div className="flex justify-center">
-              <Badge
-                variant={signed ? "default" : "secondary"}
-                style={{ background: signed ? "#23c05c" : "#f4f4f5" }}
-              >
-                {!signed ? "Not signed" : "Signed"}
-              </Badge>
+              <RequestStatusSelect request={request} className="w-[8.35rem]" />
             </div>
           )
         },
@@ -186,7 +153,7 @@ const MemberTable = () => {
   )
 
   const table = useReactTable({
-    data: members,
+    data: requests,
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -197,7 +164,7 @@ const MemberTable = () => {
     },
   })
 
-  if (isErrorMembers || isErrorProfiles) {
+  if (isErrorRequests || isErrorStakeholders) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-lg">
         <p>Error getting data.</p>
@@ -220,7 +187,7 @@ const MemberTable = () => {
             placeholder="Search..."
             disabled
           />
-          {members.length > 0 && <p>Total members: {members.length}</p>}
+          {requests.length > 0 && <p>Total requests: {requests.length}</p>}
         </div>
 
         <div className="rounded-md border">
@@ -246,13 +213,13 @@ const MemberTable = () => {
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => {
-                  const member = row.original
+                  const request = row.original
                   return (
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
                       onClick={() => {
-                        setShowMemberDialog(true), setSelectedMember(member)
+                        setShowRequestDialog(true), setSelectedRequest(request)
                       }}
                       className="cursor-pointer"
                     >
@@ -274,13 +241,13 @@ const MemberTable = () => {
                     className="h-56 text-center"
                   >
                     <div className="flex items-center justify-center gap-1">
-                      {isLoadingMembers || isLoadingProfiles ? (
+                      {isLoadingStakeholders || isLoadingRequests ? (
                         <>
                           <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                          Loading members...
+                          Loading requests...
                         </>
                       ) : (
-                        "No members found."
+                        "No requests found."
                       )}
                     </div>
                   </TableCell>
@@ -290,10 +257,10 @@ const MemberTable = () => {
           </Table>
         </div>
       </div>
-      <MemberDialog
-        open={showMemberDialog}
-        onOpenChange={setShowMemberDialog}
-        member={selectedMember}
+      <RequestDialog
+        open={showRequestDialog}
+        onOpenChange={setShowRequestDialog}
+        request={selectedRequest}
       />
     </>
   )
@@ -333,4 +300,4 @@ function DebouncedInput({
   )
 }
 
-export default MemberTable
+export default ApplicantTable

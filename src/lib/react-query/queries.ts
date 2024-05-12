@@ -8,6 +8,7 @@ import {
   INewProject,
   IOpportunity,
   IProject,
+  IRequest,
   IUpdateMember,
 } from "@/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
@@ -34,6 +35,9 @@ import {
   getProjectById,
   getProjectMilestones,
   getProjectTeam,
+  getRequestStatus,
+  getRequests,
+  getStakeholders,
   signInAccount,
   signOutAccount,
   updateClient,
@@ -41,6 +45,7 @@ import {
   updateMilestone,
   updateOpportunity,
   updateProject,
+  updateRequest,
 } from "../appwrite/api"
 import { QUERY_KEYS } from "./queryKeys"
 
@@ -219,6 +224,20 @@ export const useUpdateMember = () => {
   })
 }
 
+export const useGetStakeholders = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_STAKEHOLDERS],
+    queryFn: getStakeholders,
+  })
+}
+
+export const useGetRequests = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_REQUESTS],
+    queryFn: getRequests,
+  })
+}
+
 export const useGetMembers = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_MEMBERS],
@@ -356,5 +375,28 @@ export const useGetProjectTeam = (projectId?: string) => {
     queryKey: [QUERY_KEYS.GET_PROJECT_TEAM, projectId],
     queryFn: () => getProjectTeam(projectId),
     enabled: !!projectId,
+  })
+}
+
+export const useUpdateRequest = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (request: IRequest) => updateRequest(request),
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_REQUEST_STATUS, data?.$id],
+      })
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_REQUESTS],
+      })
+    },
+  })
+}
+
+export const useGetRequestStatus = (requestId?: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_REQUEST_STATUS, requestId],
+    queryFn: () => getRequestStatus(requestId),
+    enabled: false,
   })
 }

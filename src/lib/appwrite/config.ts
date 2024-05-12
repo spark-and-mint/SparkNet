@@ -17,6 +17,7 @@ export const appwriteConfig = {
   stakeholderCollectionId: import.meta.env
     .VITE_APPWRITE_STAKEHOLDER_COLLECTION_ID,
   updateCollectionId: import.meta.env.VITE_APPWRITE_UPDATE_COLLECTION_ID,
+  requestCollectionId: import.meta.env.VITE_APPWRITE_REQUEST_COLLECTION_ID,
 }
 
 export const client = new Client()

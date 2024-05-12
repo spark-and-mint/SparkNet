@@ -1,5 +1,5 @@
-import ApplicantTable from "@/components/shared/ApplicantTable"
+import RequestTable from "@/components/shared/RequestTable"
 
-const Home = () => <ApplicantTable />
+const Home = () => <RequestTable />
 
 export default Home

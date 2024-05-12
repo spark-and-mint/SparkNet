@@ -11,6 +11,7 @@ import ProfileSettings from "./_root/pages/ProfileSettings"
 import ClientProject from "./components/shared/client/ClientProject"
 import ClientDocuments from "./components/shared/client/ClientDocuments"
 import "./globals.css"
+import Applicants from "./_root/pages/Applicants"
 
 const App = () => (
   <main>
@@ -21,6 +22,7 @@ const App = () => (
 
       <Route element={<RootLayout />}>
         <Route index element={<Home />} />
+        <Route path="/applicants" element={<Applicants />} />
         <Route path="/members" element={<Members />} />
         <Route path="/clients" element={<Clients />} />
         <Route element={<ClientLayout />}>

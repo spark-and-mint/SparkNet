@@ -4,8 +4,12 @@ import { Link, NavLink, Outlet } from "react-router-dom"
 const RootLayout = () => {
   const links = [
     {
-      name: "Applicants",
+      name: "Requests",
       href: "/",
+    },
+    {
+      name: "Applicants",
+      href: "/applicants",
     },
     {
       name: "Members",
