@@ -163,11 +163,13 @@ const OpportunityForm = ({
                           <SelectValue placeholder="Select member" />
                         </SelectTrigger>
                         <SelectContent>
-                          {members?.documents.map((member) => (
-                            <SelectItem key={member.$id} value={member.$id}>
-                              {member.firstName} {member.lastName}
-                            </SelectItem>
-                          ))}
+                          {members?.documents
+                            .filter((member) => member.status === "accepted")
+                            .map((member) => (
+                              <SelectItem key={member.$id} value={member.$id}>
+                                {member.firstName} {member.lastName}
+                              </SelectItem>
+                            ))}
                         </SelectContent>
                       </Select>
                     </FormControl>
