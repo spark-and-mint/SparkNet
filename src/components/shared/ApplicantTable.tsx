@@ -179,7 +179,7 @@ const ApplicantTable = () => {
 
           return (
             <div className="flex justify-center">
-              <MemberStatusSelect member={member} className="w-[8.25rem]" />
+              <MemberStatusSelect member={member} className="w-[10rem]" />
             </div>
           )
         },

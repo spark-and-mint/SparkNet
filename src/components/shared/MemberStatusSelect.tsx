@@ -20,7 +20,12 @@ const MemberStatusSelect = ({ member, className }: MemberStatusSelectProps) => {
   const { data: memberStatus, refetch } = useGetMemberStatus(member.$id)
 
   const handleChange = async (
-    status: "in review" | "1on1 done" | "accepted" | "rejected"
+    status:
+      | "in review"
+      | "1on1 done"
+      | "invite shared"
+      | "accepted"
+      | "rejected"
   ) => {
     try {
       await updateMember({
@@ -61,25 +66,41 @@ const MemberStatusSelect = ({ member, className }: MemberStatusSelectProps) => {
         <SelectGroup>
           <SelectItem value="in review">
             <div className="flex items-center">
-              <span className="mr-2 text-2xl text-yellow-500">•</span>
+              <span className="mr-2 text-2xl leading-normal text-yellow-500">
+                •
+              </span>
               In review
+            </div>
+          </SelectItem>
+          <SelectItem value="invite shared">
+            <div className="flex items-center">
+              <span className="mr-2 text-2xl leading-normal text-blue-500">
+                •
+              </span>
+              Invite shared
             </div>
           </SelectItem>
           <SelectItem value="1on1 done">
             <div className="flex items-center">
-              <span className="mr-2 text-2xl text-purple-500">•</span>
+              <span className="mr-2 text-2xl leading-normal text-purple-500">
+                •
+              </span>
               1on1 done
             </div>
           </SelectItem>
           <SelectItem value="accepted">
             <div className="flex items-center">
-              <span className="mr-2 text-2xl text-green-500">•</span>
+              <span className="mr-2 text-2xl leading-normal text-green-500">
+                •
+              </span>
               Accepted
             </div>
           </SelectItem>
           <SelectItem value="rejected">
             <div className="flex items-center">
-              <span className="mr-2 text-2xl text-red-500">•</span>
+              <span className="mr-2 text-2xl leading-normal text-red-500">
+                •
+              </span>
               Rejected
             </div>
           </SelectItem>
