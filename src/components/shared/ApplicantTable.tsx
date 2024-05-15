@@ -122,7 +122,7 @@ const ApplicantTable = () => {
         cell: ({ row }) => {
           const skills = row.getValue("skills") as string[]
           return (
-            <p className="text-xs text-wrap">
+            <p className="text-xs text-wrap line-clamp-6">
               {skills && skills.length > 0 && skills.join(", ")}
             </p>
           )

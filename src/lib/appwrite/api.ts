@@ -12,6 +12,7 @@ import {
   IProject,
   IRequest,
   IUpdateMember,
+  IUpdateStakeholder,
 } from "@/types"
 import { nanoid } from "nanoid"
 
@@ -823,6 +824,30 @@ export async function updateRequest(request: IRequest) {
     }
 
     return updatedRequest
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function updateStakeholder(stakeholder: IUpdateStakeholder) {
+  try {
+    const updatedStakeholder = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.stakeholderCollectionId,
+      stakeholder.stakeholderId,
+      {
+        email: stakeholder.email,
+        firstName: stakeholder.firstName,
+        lastName: stakeholder.lastName,
+        clientId: stakeholder.clientId,
+      }
+    )
+
+    if (!updatedStakeholder) {
+      throw Error
+    }
+
+    return updatedStakeholder
   } catch (error) {
     console.log(error)
   }

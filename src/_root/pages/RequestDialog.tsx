@@ -32,7 +32,9 @@ const RequestDialog = ({ request, open, onOpenChange }: RequestDialogProps) => {
                 )}
               </div>
 
-              <div className="text-2xl font-semibold">{request?.name}</div>
+              <div className="text-2xl font-semibold">
+                {request?.firstName} {request?.lastName}
+              </div>
             </div>
             <div>
               <StatusSelect request={request} className="w-[10rem]" />

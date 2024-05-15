@@ -2,11 +2,13 @@ import * as React from "react"
 import {
   ColumnDef,
   FilterFn,
+  SortingState,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { RotateCw } from "lucide-react"
+import { ArrowUpDown, RotateCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -17,15 +19,14 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
 import { useEffect, useState } from "react"
-import { useGetMembers, useGetProfiles } from "@/lib/react-query/queries"
+import { useGetStakeholders } from "@/lib/react-query/queries"
 import { Models } from "appwrite"
 import { Link } from "react-router-dom"
-
 import { RankingInfo } from "@tanstack/match-sorter-utils"
-import { fuzzyFilter, fuzzySort } from "@/lib/utils"
-import MemberDialog from "@/_root/pages/MemberDialog"
+import { fuzzyFilter } from "@/lib/utils"
+import { Badge } from "../ui/badge"
+import { Checkbox } from "../ui/checkbox"
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -36,146 +37,127 @@ declare module "@tanstack/table-core" {
   }
 }
 
-const MemberTable = () => {
+const StakeholderTable = () => {
   const {
-    data: memberData,
-    isError: isErrorMembers,
-    isPending: isLoadingMembers,
-  } = useGetMembers()
-  const {
-    data: profileData,
-    isError: isErrorProfiles,
-    isPending: isLoadingProfiles,
-  } = useGetProfiles()
+    data: stakeholderData,
+    isError: isErrorStakeholders,
+    isPending: isLoadingStakeholders,
+  } = useGetStakeholders()
+
   const [globalFilter, setGlobalFilter] = React.useState("")
-  const [members, setMembers] = useState<Models.Document[]>([])
-  const [showMemberDialog, setShowMemberDialog] = useState(false)
-  const [selectedMember, setSelectedMember] = useState<null | Models.Document>(
-    null
-  )
+  const [sorting, setSorting] = React.useState<SortingState>([])
+  const [rowSelection, setRowSelection] = React.useState({})
+  const [stakeholders, setStakeholders] = useState<Models.Document[]>([])
 
   useEffect(() => {
-    if (memberData && profileData) {
-      const acceptedMembers = memberData.documents.filter(
-        (member) => member.status === "accepted"
-      )
-      const mergedMemberData = acceptedMembers.map((member) => {
-        const profile = profileData.documents.find(
-          (profile) => profile.memberId === member.accountId
-        )
-        return {
-          ...profile,
-          ...member,
-        }
-      })
-
-      setMembers(mergedMemberData)
+    if (stakeholderData) {
+      setStakeholders(stakeholderData.documents)
     }
-  }, [memberData, profileData])
+  }, [stakeholderData])
 
   const columns = React.useMemo<ColumnDef<Models.Document>[]>(
     () => [
       {
+        id: "select",
+        header: ({ table }) => (
+          <Checkbox
+            checked={
+              table.getIsAllPageRowsSelected() ||
+              (table.getIsSomePageRowsSelected() && "indeterminate")
+            }
+            onCheckedChange={(value) =>
+              table.toggleAllPageRowsSelected(!!value)
+            }
+            aria-label="Select all"
+            className="w-5 h-5 mt-1"
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+            aria-label="Select row"
+            className="w-5 h-5 mt-1"
+          />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+      },
+      {
         accessorKey: "name",
-        header: "Member",
+        header: "From",
         cell: ({ row }) => {
-          const member = row.original
+          const stakeholder = row.original
           return (
             <div className="flex items-center gap-2 w-[12rem]">
               <img
-                src={member?.avatarUrl}
+                src={stakeholder?.avatarUrl}
                 alt="avatar"
                 className="w-10 h-10 rounded-full"
               />
               <div className="flex flex-col w-[10rem]">
                 <p className="py-1 text-sm font-medium leading-none truncate">
-                  {member?.firstName} {member?.lastName}
+                  {stakeholder?.firstName} {stakeholder?.lastName}
                 </p>
-                <p className="py-1 text-xs leading-none text-muted-foreground truncate">
-                  {member?.email}
+                <p className=" py-1 text-xs leading-none text-muted-foreground truncate">
+                  {stakeholder?.email}
                 </p>
               </div>
             </div>
           )
         },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
       },
       {
-        accessorKey: "roles",
-        header: "Roles",
-        cell: ({ row }) => {
-          const roles = row.getValue("roles") as string[]
-          return (
-            <div className="max-w-[12rem]">
-              <p className="text-xs text-wrap line-clamp-6">
-                {roles && roles.length > 0 && roles.join(", ")}
-              </p>
-            </div>
-          )
-        },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
-      },
-      {
-        accessorKey: "skills",
-        header: "Skills",
-        cell: ({ row }) => {
-          const skills = row.getValue("skills") as string[]
-          return (
-            <div className="max-w-[12rem]">
-              <p className="text-xs text-wrap line-clamp-6">
-                {skills && skills.length > 0 && skills.join(", ")}
-              </p>
-            </div>
-          )
-        },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
-      },
-      {
-        accessorKey: "domains",
-        header: "Industries",
-        cell: ({ row }) => {
-          const domains = row.getValue("domains") as string[]
-          return (
-            <div className="max-w-[12rem]">
-              <p className="text-xs truncate text-wrap">
-                {domains && domains.length > 0 && domains.join(", ")}
-              </p>
-            </div>
-          )
-        },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
-      },
-      {
-        accessorKey: "seniority",
-        header: () => <div className="text-center">Seniority</div>,
+        accessorKey: "company",
+        header: "Company",
         cell: ({ row }) => {
           return (
-            <div className="text-center capitalize text-sm">
-              {row.getValue("seniority")}
-            </div>
+            <div className="capitalize text-sm">{row.getValue("company")}</div>
           )
         },
-        filterFn: "fuzzy",
-        sortingFn: fuzzySort,
       },
       {
-        accessorKey: "contractSigned",
-        header: () => (
-          <div className="text-center text-nowrap">Contract signed</div>
-        ),
+        accessorKey: "$createdAt",
+        header: "Sign Up Date",
         cell: ({ row }) => {
-          const signed = row.getValue("contractSigned")
+          const date = row.getValue("$createdAt") as Date
+          const dateString = new Date(date).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          })
+          return <div className="capitalize text-sm">{dateString}</div>
+        },
+      },
+      {
+        accessorKey: "clientId",
+        header: ({ column }) => {
           return (
             <div className="flex justify-center">
-              <Badge
-                variant={signed ? "default" : "secondary"}
-                style={{ background: signed ? "#23c05c" : "#f4f4f5" }}
+              <Button
+                variant="ghost"
+                onClick={() =>
+                  column.toggleSorting(column.getIsSorted() === "asc")
+                }
               >
-                {!signed ? "Not signed" : "Signed"}
+                Active
+                <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          )
+        },
+        sortingFn: "alphanumeric",
+        cell: ({ row }) => {
+          const active = row.getValue("clientId")
+
+          return (
+            <div className="flex justify-center text-center">
+              <Badge
+                variant={active ? "default" : "destructive"}
+                style={{ background: active ? "#23c05c" : "" }}
+                className="flex justify-center w-11 py-1"
+              >
+                {!active ? "No" : "Yes"}
               </Badge>
             </div>
           )
@@ -186,18 +168,23 @@ const MemberTable = () => {
   )
 
   const table = useReactTable({
-    data: members,
+    data: stakeholders,
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
     },
     getCoreRowModel: getCoreRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onRowSelectionChange: setRowSelection,
     state: {
+      sorting,
       globalFilter,
+      rowSelection,
     },
   })
 
-  if (isErrorMembers || isErrorProfiles) {
+  if (isErrorStakeholders) {
     return (
       <div className="flex flex-col items-center justify-center gap-6 h-96 text-center border rounded-lg">
         <p>Error getting data.</p>
@@ -220,7 +207,9 @@ const MemberTable = () => {
             placeholder="Search..."
             disabled
           />
-          {members.length > 0 && <p>Total members: {members.length}</p>}
+          {stakeholders.length > 0 && (
+            <p>Total stakeholders: {stakeholders.length}</p>
+          )}
         </div>
 
         <div className="rounded-md border">
@@ -246,15 +235,10 @@ const MemberTable = () => {
             <TableBody>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => {
-                  const member = row.original
                   return (
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      onClick={() => {
-                        setShowMemberDialog(true), setSelectedMember(member)
-                      }}
-                      className="cursor-pointer"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
@@ -274,13 +258,13 @@ const MemberTable = () => {
                     className="h-56 text-center"
                   >
                     <div className="flex items-center justify-center gap-1">
-                      {isLoadingMembers || isLoadingProfiles ? (
+                      {isLoadingStakeholders ? (
                         <>
                           <RotateCw className="mr-2 h-4 w-4 animate-spin" />
-                          Loading members...
+                          Loading stakeholders...
                         </>
                       ) : (
-                        "No members found."
+                        "No stakeholders found."
                       )}
                     </div>
                   </TableCell>
@@ -289,12 +273,11 @@ const MemberTable = () => {
             </TableBody>
           </Table>
         </div>
+        <div className="mt-6 text-sm">
+          {table.getFilteredSelectedRowModel().rows.length} of{" "}
+          {table.getFilteredRowModel().rows.length} row(s) selected.
+        </div>
       </div>
-      <MemberDialog
-        open={showMemberDialog}
-        onOpenChange={setShowMemberDialog}
-        member={selectedMember}
-      />
     </>
   )
 }
@@ -333,4 +316,4 @@ function DebouncedInput({
   )
 }
 
-export default MemberTable
+export default StakeholderTable

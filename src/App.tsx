@@ -12,6 +12,8 @@ import ClientProject from "./components/shared/client/ClientProject"
 import ClientDocuments from "./components/shared/client/ClientDocuments"
 import "./globals.css"
 import Applicants from "./_root/pages/Applicants"
+import ClientStakeholders from "./components/shared/client/ClientStakeholders"
+import StakeholderTable from "./components/shared/StakeholderTable"
 
 const App = () => (
   <main>
@@ -22,6 +24,7 @@ const App = () => (
 
       <Route element={<RootLayout />}>
         <Route index element={<Home />} />
+        <Route path="/stakeholders" element={<StakeholderTable />} />
         <Route path="/applicants" element={<Applicants />} />
         <Route path="/members" element={<Members />} />
         <Route path="/clients" element={<Clients />} />
@@ -32,6 +35,10 @@ const App = () => (
             element={<ClientOpportunities />}
           />
           <Route path="/clients/:id/settings" element={<ClientSettings />} />
+          <Route
+            path="/clients/:id/stakeholders"
+            element={<ClientStakeholders />}
+          />
           <Route path="/clients/:id/documents" element={<ClientDocuments />} />
           <Route
             path="/clients/:id/invoices"

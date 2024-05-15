@@ -25,6 +25,10 @@ const ClientLayout = () => {
       to: `/clients/${id}/opportunities`,
     },
     {
+      title: "Stakeholders",
+      to: `/clients/${id}/stakeholders`,
+    },
+    {
       title: "Legal docs",
       to: `/clients/${id}/documents`,
     },

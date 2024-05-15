@@ -74,7 +74,7 @@ const ApplicantTable = () => {
     () => [
       {
         accessorKey: "name",
-        header: "Name",
+        header: "From",
         cell: ({ row }) => {
           const stakeholder = row.original
           return (

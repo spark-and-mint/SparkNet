@@ -10,6 +10,7 @@ import {
   IProject,
   IRequest,
   IUpdateMember,
+  IUpdateStakeholder,
 } from "@/types"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
@@ -46,6 +47,7 @@ import {
   updateOpportunity,
   updateProject,
   updateRequest,
+  updateStakeholder,
 } from "../appwrite/api"
 import { QUERY_KEYS } from "./queryKeys"
 
@@ -398,5 +400,18 @@ export const useGetRequestStatus = (requestId?: string) => {
     queryKey: [QUERY_KEYS.GET_REQUEST_STATUS, requestId],
     queryFn: () => getRequestStatus(requestId),
     enabled: false,
+  })
+}
+
+export const useUpdateStakeholder = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (stakeholder: IUpdateStakeholder) =>
+      updateStakeholder(stakeholder),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_STAKEHOLDERS],
+      })
+    },
   })
 }

@@ -105,6 +105,19 @@ export type IClient = {
   file: File[]
 }
 
+export type IUpdateStakeholder = {
+  stakeholderId: string
+  email: string
+  firstName: string
+  lastName: string
+  company?: string
+  clientId?: string
+  file?: File[]
+  avatarId?: string
+  avatarUrl?: URL | string
+  emailVerification?: boolean
+}
+
 export type IResource = {
   title: string
   link: string

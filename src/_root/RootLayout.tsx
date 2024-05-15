@@ -16,6 +16,10 @@ const RootLayout = () => {
       href: "/members",
     },
     {
+      name: "Stakeholders",
+      href: "/stakeholders",
+    },
+    {
       name: "Clients",
       href: "/clients",
     },
