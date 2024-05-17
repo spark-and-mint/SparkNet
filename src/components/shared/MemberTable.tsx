@@ -140,7 +140,7 @@ const MemberTable = () => {
           const domains = row.getValue("domains") as string[]
           return (
             <div className="max-w-[12rem]">
-              <p className="text-xs truncate text-wrap">
+              <p className="text-xs truncate text-wrap line-clamp-6">
                 {domains && domains.length > 0 && domains.join(", ")}
               </p>
             </div>

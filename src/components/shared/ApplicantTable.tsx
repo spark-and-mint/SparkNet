@@ -108,7 +108,7 @@ const ApplicantTable = () => {
         cell: ({ row }) => {
           const roles = row.getValue("roles") as string[]
           return (
-            <p className="text-xs text-wrap">
+            <p className="text-xs text-wrap line-clamp-6">
               {roles && roles.length > 0 && roles.join(", ")}
             </p>
           )
@@ -136,7 +136,7 @@ const ApplicantTable = () => {
         cell: ({ row }) => {
           const domains = row.getValue("domains") as string[]
           return (
-            <p className="text-xs text-wrap">
+            <p className="text-xs text-wrap line-clamp-6">
               {domains && domains.length > 0 && domains.join(", ")}
             </p>
           )
