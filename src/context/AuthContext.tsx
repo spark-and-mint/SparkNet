@@ -13,7 +13,7 @@ export const INITIAL_MEMBER: IMember = {
   firstName: "",
   lastName: "",
   timezone: "",
-  status: null,
+  status: "",
   avatarUrl: "",
   avatarId: "",
   contractSigned: false,
