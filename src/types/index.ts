@@ -14,13 +14,7 @@ export type IMember = {
   importedAnswers: boolean
   name: string
   timezone: string
-  status:
-    | "in review"
-    | "1on1 done"
-    | "invite shared"
-    | "accepted"
-    | "rejected"
-    | null
+  status: string
   avatarUrl: string
   avatarId: string
   contractSigned: boolean
@@ -57,13 +51,7 @@ export type IUpdateMember = {
   avatarId: string
   avatarUrl?: URL | string
   timezone?: string | null
-  status?:
-    | "in review"
-    | "1on1 done"
-    | "invite shared"
-    | "accepted"
-    | "rejected"
-    | null
+  status?: string
   contractSigned?: boolean
   profile?: {
     workStatus?: string

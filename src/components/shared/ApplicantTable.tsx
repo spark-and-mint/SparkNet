@@ -176,10 +176,9 @@ const ApplicantTable = () => {
         header: () => <div className="text-center">Status</div>,
         cell: ({ row }) => {
           const member = row.original
-
           return (
             <div className="flex justify-center">
-              <MemberStatusSelect member={member} className="w-[10rem]" />
+              <MemberStatusSelect member={member} className="w-[12rem]" />
             </div>
           )
         },

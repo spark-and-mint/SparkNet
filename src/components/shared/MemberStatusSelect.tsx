@@ -22,8 +22,9 @@ const MemberStatusSelect = ({ member, className }: MemberStatusSelectProps) => {
   const handleChange = async (
     status:
       | "in review"
-      | "1on1 done"
-      | "invite shared"
+      | "request for info"
+      | "1on1 pending"
+      | "decision pending"
       | "accepted"
       | "rejected"
   ) => {
@@ -39,12 +40,6 @@ const MemberStatusSelect = ({ member, className }: MemberStatusSelectProps) => {
         file: [],
         status: status,
       })
-
-      toast.success(
-        `${member.firstName}'s status updated to "${
-          status.charAt(0).toUpperCase() + status.slice(1)
-        }"`
-      )
 
       refetch()
     } catch (error) {
@@ -72,20 +67,28 @@ const MemberStatusSelect = ({ member, className }: MemberStatusSelectProps) => {
               In review
             </div>
           </SelectItem>
-          <SelectItem value="invite shared">
+          <SelectItem value="request for info">
             <div className="flex items-center">
               <span className="mr-2 text-2xl leading-normal text-blue-500">
                 •
               </span>
-              Invite shared
+              Request for info
             </div>
           </SelectItem>
-          <SelectItem value="1on1 done">
+          <SelectItem value="1on1 pending">
             <div className="flex items-center">
               <span className="mr-2 text-2xl leading-normal text-purple-500">
                 •
               </span>
-              1on1 done
+              1on1 pending
+            </div>
+          </SelectItem>
+          <SelectItem value="decision pending">
+            <div className="flex items-center">
+              <span className="mr-2 text-2xl leading-normal text-slate-500">
+                •
+              </span>
+              Decision pending
             </div>
           </SelectItem>
           <SelectItem value="accepted">
