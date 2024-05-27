@@ -1,5 +1,6 @@
 import {
   IClient,
+  IDocument,
   IMember,
   IMilestone,
   INewClient,
@@ -16,13 +17,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import {
   assignMemberToClient,
   createClient,
+  createDocument,
   createMilestone,
   createOpportunity,
   createProject,
   deleteClient,
+  deleteDocument,
   deleteMilestone,
   deleteOpportunity,
   getClientById,
+  getClientDocuments,
   getClientOpportunities,
   getClientProjects,
   getClients,
@@ -39,6 +43,7 @@ import {
   getRequestStatus,
   getRequests,
   getStakeholders,
+  getUpdateFeedback,
   signInAccount,
   signOutAccount,
   updateClient,
@@ -413,5 +418,45 @@ export const useUpdateStakeholder = () => {
         queryKey: [QUERY_KEYS.GET_STAKEHOLDERS],
       })
     },
+  })
+}
+
+export const useGetClientDocuments = (clientId?: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_CLIENT_DOCUMENTS, clientId],
+    queryFn: () => getClientDocuments(clientId),
+    enabled: !!clientId,
+  })
+}
+
+export const useCreateDocument = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (document: IDocument) => createDocument(document),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CLIENT_DOCUMENTS],
+      })
+    },
+  })
+}
+
+export const useDeleteDocument = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (documentId: string) => deleteDocument(documentId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CLIENT_DOCUMENTS],
+      })
+    },
+  })
+}
+
+export const useGetUpdateFeedback = (updateId: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_UPDATE_FEEDBACK, updateId],
+    queryFn: () => getUpdateFeedback(updateId),
+    enabled: !!updateId,
   })
 }

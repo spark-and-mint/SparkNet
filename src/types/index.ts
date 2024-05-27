@@ -86,7 +86,7 @@ export type IClient = {
   linkedin?: string
   description?: string
   members?: IMember[]
-  resources?: IResource[]
+  documents?: IDocument[]
   projects?: IProject[]
   logoUrl: URL | string
   logoId: string
@@ -106,10 +106,10 @@ export type IUpdateStakeholder = {
   emailVerification?: boolean
 }
 
-export type IResource = {
+export type IDocument = {
+  clientId: string
   title: string
   link: string
-  type: "design" | "document" | "other"
 }
 
 export type IOption = {

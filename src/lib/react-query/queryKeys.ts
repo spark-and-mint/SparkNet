@@ -12,6 +12,7 @@ export enum QUERY_KEYS {
   // CLIENT KEYS
   GET_CLIENTS = "getClients",
   GET_CLIENT_BY_ID = "getClientById",
+  GET_CLIENT_DOCUMENTS = "getClientDocuments",
 
   // STAKEHOLDER KEYS
   GET_STAKEHOLDERS = "getStakeholders",
@@ -30,6 +31,9 @@ export enum QUERY_KEYS {
   GET_PROJECT_MILESTONES = "getProjectMilestones",
   GET_MILESTONE_UPDATES = "getMilestoneUpdates",
   GET_MILESTONE_BY_ID = "getMilestoneById",
+
+  // UPDATE KEYS
+  GET_UPDATE_FEEDBACK = "getUpdateFeedback",
 
   // REQUEST KEYS
   GET_REQUEST_STATUS = "getRequestStatus",

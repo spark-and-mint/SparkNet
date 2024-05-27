@@ -13,7 +13,7 @@ export const appwriteConfig = {
     .VITE_APPWRITE_OPPORTUNITY_COLLECTION_ID,
   profileCollectionId: import.meta.env.VITE_APPWRITE_PROFILE_COLLECTION_ID,
   projectCollectionId: import.meta.env.VITE_APPWRITE_PROJECT_COLLECTION_ID,
-  resourceCollectionId: import.meta.env.VITE_APPWRITE_RESOURCE_COLLECTION_ID,
+  documentCollectionId: import.meta.env.VITE_APPWRITE_DOCUMENT_COLLECTION_ID,
   stakeholderCollectionId: import.meta.env
     .VITE_APPWRITE_STAKEHOLDER_COLLECTION_ID,
   updateCollectionId: import.meta.env.VITE_APPWRITE_UPDATE_COLLECTION_ID,

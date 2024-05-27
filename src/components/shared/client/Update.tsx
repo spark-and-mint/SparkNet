@@ -10,10 +10,15 @@ import {
   CollapsibleTrigger,
 } from "@/components/ui/collapsible"
 import { cn, toRelativeTimeString } from "@/lib/utils"
-import { useGetMemberById } from "@/lib/react-query/queries"
+import {
+  useGetMemberById,
+  useGetUpdateFeedback,
+} from "@/lib/react-query/queries"
+import { Separator } from "@/components/ui/separator"
 
 const Update = ({ update }: { update: Models.Document }) => {
   const { data: creator } = useGetMemberById(update.creatorId)
+  const { data: feedback } = useGetUpdateFeedback(update.$id)
   const [isOpen, setIsOpen] = useState(false)
 
   return (
@@ -70,6 +75,26 @@ const Update = ({ update }: { update: Models.Document }) => {
                         {update.link ?? update.fileUrl}
                       </Link>
                     </Button>
+                  </dd>
+                </div>
+              ) : null}
+
+              {feedback && feedback.length > 0 ? (
+                <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                  <dt className="flex items-center text-sm font-medium leading-6 text-primary">
+                    Feedback
+                  </dt>
+                  <dd className="mt-1 text-sm leading-6 sm:col-span-2 sm:mt-0">
+                    <div className="flex flex-col gap-4">
+                      {feedback[0].label && (
+                        <>
+                          <p className="">{feedback[0].label}</p>
+                          {feedback[0].text && <Separator />}
+                        </>
+                      )}
+
+                      {feedback[0].text && <p>{feedback[0].text}</p>}
+                    </div>
                   </dd>
                 </div>
               ) : null}

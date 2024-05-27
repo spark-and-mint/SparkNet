@@ -45,7 +45,7 @@ const ClientStakeholders = () => {
       )
       toast.success("Client updated successfully!")
     } catch (error) {
-      toast.error("This is not wired up yet.")
+      toast.error("Could not update client.")
     }
   }
 

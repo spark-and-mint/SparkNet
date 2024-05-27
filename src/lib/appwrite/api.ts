@@ -2,6 +2,7 @@ import { ID, Models, Query } from "appwrite"
 import { appwriteConfig, account, databases, storage, avatars } from "./config"
 import {
   IClient,
+  IDocument,
   IMember,
   IMilestone,
   INewClient,
@@ -381,7 +382,7 @@ export async function updateClient(client: IClient) {
         website: client.website,
         x: client.x,
         linkedin: client.linkedin,
-        resources: client.resources,
+        documents: client.documents,
         projects: client.projects,
         logoUrl: logo.logoUrl,
         logoId: logo.logoId,
@@ -848,6 +849,82 @@ export async function updateStakeholder(stakeholder: IUpdateStakeholder) {
     }
 
     return updatedStakeholder
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getClientDocuments(clientId?: string) {
+  if (!clientId) return
+
+  try {
+    const documents = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.documentCollectionId,
+      [Query.equal("clientId", clientId), Query.orderDesc("$createdAt")]
+    )
+
+    if (!documents) throw Error
+
+    return documents
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function createDocument(document: IDocument) {
+  try {
+    const newDocument = await databases.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.documentCollectionId,
+      ID.unique(),
+      {
+        clientId: document.clientId,
+        title: document.title,
+        link: document.link,
+      }
+    )
+
+    return newDocument
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function deleteDocument(documentId?: string) {
+  if (!documentId) return
+
+  try {
+    const statusCode = await databases.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.documentCollectionId,
+      documentId
+    )
+
+    if (!statusCode) throw Error
+
+    return { status: "Ok", documentId }
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function getUpdateFeedback(updateId?: string) {
+  if (!updateId) return
+
+  try {
+    const feedback = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.feedbackCollectionId
+    )
+
+    if (!feedback) throw Error
+
+    const feedbackUpdate = feedback.documents.filter(
+      (feedback: Models.Document) => feedback.updateId === updateId
+    )
+
+    return feedbackUpdate
   } catch (error) {
     console.log(error)
   }
