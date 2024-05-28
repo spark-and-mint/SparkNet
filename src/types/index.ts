@@ -110,6 +110,12 @@ export type IDocument = {
   clientId: string
   title: string
   link: string
+  status?: string
+}
+
+export type IUpdateDocument = {
+  documentId: string
+  status: string
 }
 
 export type IOption = {

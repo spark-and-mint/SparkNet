@@ -10,6 +10,7 @@ import {
   IOpportunity,
   IProject,
   IRequest,
+  IUpdateDocument,
   IUpdateMember,
   IUpdateStakeholder,
 } from "@/types"
@@ -47,6 +48,7 @@ import {
   signInAccount,
   signOutAccount,
   updateClient,
+  updateDocument,
   updateMember,
   updateMilestone,
   updateOpportunity,
@@ -433,6 +435,18 @@ export const useCreateDocument = () => {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (document: IDocument) => createDocument(document),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_CLIENT_DOCUMENTS],
+      })
+    },
+  })
+}
+
+export const useUpdateDocument = () => {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (document: IUpdateDocument) => updateDocument(document),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GET_CLIENT_DOCUMENTS],

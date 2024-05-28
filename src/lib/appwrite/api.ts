@@ -12,6 +12,7 @@ import {
   IOpportunity,
   IProject,
   IRequest,
+  IUpdateDocument,
   IUpdateMember,
   IUpdateStakeholder,
 } from "@/types"
@@ -882,10 +883,32 @@ export async function createDocument(document: IDocument) {
         clientId: document.clientId,
         title: document.title,
         link: document.link,
+        status: document.status,
       }
     )
 
     return newDocument
+  } catch (error) {
+    console.log(error)
+  }
+}
+
+export async function updateDocument(document: IUpdateDocument) {
+  try {
+    const updatedDocument = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.documentCollectionId,
+      document.documentId,
+      {
+        status: document.status,
+      }
+    )
+
+    if (!updatedDocument) {
+      throw Error
+    }
+
+    return updatedDocument
   } catch (error) {
     console.log(error)
   }

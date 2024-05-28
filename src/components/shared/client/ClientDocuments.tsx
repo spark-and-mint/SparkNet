@@ -14,10 +14,18 @@ import {
   useCreateDocument,
   useDeleteDocument,
   useGetClientDocuments,
+  useUpdateDocument,
 } from "@/lib/react-query/queries"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui"
+import {
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui"
 import { Separator } from "@/components/ui/separator"
 import { ExternalLink, PlusIcon, RotateCw, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -32,6 +40,7 @@ const clientDocumentsSchema = z.object({
       link: z.string().url({
         message: "Invalid url. Please add https.",
       }),
+      status: z.string().optional(),
     })
   ),
 })
@@ -55,23 +64,27 @@ const ClientDocuments = () => {
 
   const { mutateAsync: createDocument, isPending: isLoadingCreate } =
     useCreateDocument()
-
+  const { mutateAsync: updateDocument } = useUpdateDocument()
   const { mutateAsync: deleteDocument } = useDeleteDocument()
 
   const handleSubmit = async (value: ClientDocumentsValues) => {
     try {
-      await Promise.all(
-        value.documents.map((document: { title: string; link: string }) =>
-          createDocument({
-            clientId: client.$id,
-            title: document.title,
-            link: document.link,
-          })
+      const updatedDocuments = await Promise.all(
+        value.documents.map(
+          (document: { title: string; link: string; status?: string }) => {
+            createDocument({
+              clientId: client.$id,
+              title: document.title,
+              link: document.link,
+              status: document.status,
+            })
+          }
         )
       )
-
-      remove()
-      toast.success("Client updated successfully!")
+      if (updatedDocuments) {
+        remove()
+        toast.success("Client updated successfully!")
+      }
     } catch (error) {
       toast.error("Could not update client.")
     }
@@ -87,6 +100,36 @@ const ClientDocuments = () => {
       })
     } catch (error) {
       toast.error("Could not delete document.")
+    }
+  }
+
+  const documentStatuses = [
+    "Draft",
+    "Pending Approval",
+    "Approved",
+    "Signed",
+    "In Effect",
+    "Expired",
+    "Archived",
+    "Amended",
+    "Cancelled",
+    "Under Negotiation",
+  ]
+
+  const handleStatusChange = async (documentId: string, status: string) => {
+    try {
+      const updatedDocument = await updateDocument({
+        documentId,
+        status,
+      })
+
+      if (updatedDocument) {
+        toast.success(`Document status updated to ${status}.`)
+      } else {
+        toast.error("Could not update document status.")
+      }
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -124,14 +167,34 @@ const ClientDocuments = () => {
                               <ExternalLink className="h-4 w-4 ml-2" />
                             </Button>
                           </Link>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => handleDelete(document.$id)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                          <div className="flex gap-4">
+                            <Select
+                              defaultValue={document.status || ""}
+                              onValueChange={(status) =>
+                                handleStatusChange(document.$id, status)
+                              }
+                            >
+                              <SelectTrigger className="min-w-40">
+                                <SelectValue placeholder="Select status" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {documentStatuses.map((status: string) => (
+                                  <SelectItem key={status} value={status}>
+                                    {status}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="icon"
+                              onClick={() => handleDelete(document.$id)}
+                              className="w-14"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       ))}
                     </>
@@ -145,7 +208,7 @@ const ClientDocuments = () => {
                         control={form.control}
                         name={`documents.${index}.title`}
                         render={({ field }) => (
-                          <FormItem className="relative w-3/5">
+                          <FormItem className="relative w-3/4">
                             <FormLabel>Title</FormLabel>
                             <FormControl>
                               <Input {...field} />
