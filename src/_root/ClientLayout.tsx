@@ -33,8 +33,8 @@ const ClientLayout = () => {
       to: `/clients/${id}/documents`,
     },
     {
-      title: "Invoices",
-      to: `/clients/${id}/invoices`,
+      title: "Payments",
+      to: `/clients/${id}/payments`,
     },
     {
       title: "Settings",

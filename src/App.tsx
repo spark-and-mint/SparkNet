@@ -14,6 +14,7 @@ import "./globals.css"
 import Applicants from "./_root/pages/Applicants"
 import ClientStakeholders from "./components/shared/client/ClientStakeholders"
 import StakeholderTable from "./components/shared/StakeholderTable"
+import ClientPayments from "./components/shared/client/ClientPayments"
 
 const App = () => (
   <main>
@@ -40,10 +41,7 @@ const App = () => (
             element={<ClientStakeholders />}
           />
           <Route path="/clients/:id/documents" element={<ClientDocuments />} />
-          <Route
-            path="/clients/:id/invoices"
-            element={<p>Invoices will be shown here.</p>}
-          />
+          <Route path="/clients/:id/payments" element={<ClientPayments />} />
           <Route
             path="/clients/:id/project/:projectId"
             element={<ClientProject />}

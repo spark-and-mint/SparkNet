@@ -111,11 +111,13 @@ export type IDocument = {
   title: string
   link: string
   status?: string
+  invoice?: boolean
 }
 
 export type IUpdateDocument = {
   documentId: string
   status: string
+  invoice?: boolean
 }
 
 export type IOption = {

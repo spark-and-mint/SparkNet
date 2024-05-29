@@ -1,4 +1,4 @@
-import { ID, Models, Query } from "appwrite"
+import { ID, Query } from "appwrite"
 import { appwriteConfig, account, databases, storage, avatars } from "./config"
 import {
   IClient,
@@ -878,6 +878,7 @@ export async function createDocument(document: IDocument) {
         title: document.title,
         link: document.link,
         status: document.status,
+        invoice: document.invoice,
       }
     )
 

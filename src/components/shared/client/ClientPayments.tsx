@@ -49,11 +49,9 @@ type ClientDocumentsValues = z.infer<typeof clientDocumentsSchema>
 
 const ClientDocuments = () => {
   const client = useClient()
-  const { data: documentData, isPending: isPendingDocuments } =
+  const { data: documents, isPending: isPendingDocuments } =
     useGetClientDocuments(client.$id)
-  const documents = documentData?.documents.filter(
-    (doc) => doc.invoice !== true
-  )
+  const invoices = documents?.documents.filter((doc) => doc.invoice === true)
 
   const form = useForm<ClientDocumentsValues>({
     resolver: zodResolver(clientDocumentsSchema),
@@ -71,6 +69,7 @@ const ClientDocuments = () => {
   const { mutateAsync: deleteDocument } = useDeleteDocument()
 
   const handleSubmit = async (value: ClientDocumentsValues) => {
+    console.log(fields)
     try {
       const updatedDocuments = await Promise.all(
         value.documents.map(
@@ -79,7 +78,8 @@ const ClientDocuments = () => {
               clientId: client.$id,
               title: document.title,
               link: document.link,
-              status: document.status,
+              status: "Awaiting Payment",
+              invoice: true,
             })
           }
         )
@@ -109,18 +109,7 @@ const ClientDocuments = () => {
     }
   }
 
-  const documentStatuses = [
-    "Draft",
-    "Pending Approval",
-    "Approved",
-    "Signed",
-    "In Effect",
-    "Expired",
-    "Archived",
-    "Amended",
-    "Cancelled",
-    "Under Negotiation",
-  ]
+  const documentStatuses = ["Paid", "Awaiting Payment", "Cancelled"]
 
   const handleStatusChange = async (documentId: string, status: string) => {
     try {
@@ -142,9 +131,9 @@ const ClientDocuments = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium mb-2">Legal documents</h3>
+        <h3 className="text-lg font-medium mb-2">Payments and invoices</h3>
         <p className="text-sm text-muted-foreground">
-          Add the master service agreement (MSA), contracts, proposals, etc.
+          Client payment and invoice management.
         </p>
       </div>
       <Separator />
@@ -154,13 +143,13 @@ const ClientDocuments = () => {
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)}>
             <div className="space-y-4">
-              {documents && documents.length < 1 && fields.length === 0 ? (
-                <p className="py-3 text-sm">No documents added yet.</p>
+              {invoices && invoices.length < 1 && fields.length === 0 ? (
+                <p className="py-3 text-sm">No invoices added yet.</p>
               ) : (
                 <>
-                  {documents && documents.length > 0 ? (
+                  {invoices && invoices.length > 0 ? (
                     <>
-                      {documents.map((document: Models.Document) => (
+                      {invoices.map((document: Models.Document) => (
                         <div
                           key={document.$id}
                           className="flex items-center justify-between gap-6"
@@ -226,7 +215,7 @@ const ClientDocuments = () => {
                         name={`documents.${index}.link`}
                         render={({ field }) => (
                           <FormItem className="relative w-full">
-                            <FormLabel>Link</FormLabel>
+                            <FormLabel>Payment link</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -247,7 +236,7 @@ const ClientDocuments = () => {
               onClick={() => append({ title: "", link: "" })}
             >
               <PlusIcon className="mr-2 h-4 w-4" />
-              Add document
+              Add invoice
             </Button>
             <div className="flex justify-end mt-8">
               <Button
@@ -260,7 +249,7 @@ const ClientDocuments = () => {
                     Updating...
                   </div>
                 ) : (
-                  "Update documents"
+                  "Update payments"
                 )}
               </Button>
             </div>
