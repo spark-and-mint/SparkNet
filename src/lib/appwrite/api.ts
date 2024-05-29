@@ -659,16 +659,13 @@ export async function getProjectMilestones(projectId?: string) {
   try {
     const milestones = await databases.listDocuments(
       appwriteConfig.databaseId,
-      appwriteConfig.milestoneCollectionId
+      appwriteConfig.milestoneCollectionId,
+      [Query.equal("projectId", projectId)]
     )
 
     if (!milestones) throw Error
 
-    const projectMilestones = milestones.documents.filter(
-      (milestone: Models.Document) => milestone.projectId === projectId
-    )
-
-    return projectMilestones
+    return milestones.documents
   } catch (error) {
     console.log(error)
   }
@@ -680,16 +677,13 @@ export async function getMilestoneUpdates(milestoneId?: string) {
   try {
     const updates = await databases.listDocuments(
       appwriteConfig.databaseId,
-      appwriteConfig.updateCollectionId
+      appwriteConfig.updateCollectionId,
+      [Query.equal("milestoneId", milestoneId)]
     )
 
     if (!updates) throw Error
 
-    const milestoneUpdates = updates.documents.filter(
-      (update: Models.Document) => update.milestoneId === milestoneId
-    )
-
-    return milestoneUpdates
+    return updates.documents
   } catch (error) {
     console.log(error)
   }
@@ -938,16 +932,13 @@ export async function getUpdateFeedback(updateId?: string) {
   try {
     const feedback = await databases.listDocuments(
       appwriteConfig.databaseId,
-      appwriteConfig.feedbackCollectionId
+      appwriteConfig.feedbackCollectionId,
+      [Query.equal("updateId", updateId)]
     )
 
     if (!feedback) throw Error
 
-    const feedbackUpdate = feedback.documents.filter(
-      (feedback: Models.Document) => feedback.updateId === updateId
-    )
-
-    return feedbackUpdate
+    return feedback.documents
   } catch (error) {
     console.log(error)
   }
