@@ -2,11 +2,13 @@ import * as React from "react"
 import {
   ColumnDef,
   FilterFn,
+  SortingState,
   flexRender,
   getCoreRowModel,
+  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { RotateCw } from "lucide-react"
+import { ArrowUpDown, RotateCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -48,7 +50,8 @@ const ApplicantTable = () => {
     isPending: isLoadingProfiles,
   } = useGetProfiles()
 
-  const [globalFilter, setGlobalFilter] = React.useState("")
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [globalFilter, setGlobalFilter] = useState("")
   const [members, setMembers] = useState<Models.Document[]>([])
   const [showMemberDialog, setShowMemberDialog] = useState(false)
   const [selectedMember, setSelectedMember] = useState<null | Models.Document>(
@@ -147,20 +150,6 @@ const ApplicantTable = () => {
       {
         accessorKey: "seniority",
         header: "Seniortiy",
-        // header: ({ column }) => {
-        //   return (
-        //     <Button
-        //       variant="ghost"
-        //       onClick={() =>
-        //         column.toggleSorting(column.getIsSorted() === "asc")
-        //       }
-        //       className="-ml-4"
-        //     >
-        //       Seniority
-        //       <ArrowUpDown className="ml-2 h-4 w-4" />
-        //     </Button>
-        //   )
-        // },
         cell: ({ row }) => {
           return (
             <div className="text-center capitalize text-sm">
@@ -173,7 +162,20 @@ const ApplicantTable = () => {
       },
       {
         accessorKey: "status",
-        header: () => <div className="text-center">Status</div>,
+        header: ({ column }) => {
+          return (
+            <Button
+              variant="ghost"
+              onClick={() =>
+                column.toggleSorting(column.getIsSorted() === "asc")
+              }
+              className="w-full"
+            >
+              Status
+              <ArrowUpDown className="ml-2 h-4 w-4" />
+            </Button>
+          )
+        },
         cell: ({ row }) => {
           const member = row.original
           return (
@@ -190,11 +192,14 @@ const ApplicantTable = () => {
   const table = useReactTable({
     data: members,
     columns,
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
     filterFns: {
       fuzzy: fuzzyFilter,
     },
     getCoreRowModel: getCoreRowModel(),
     state: {
+      sorting,
       globalFilter,
     },
   })
