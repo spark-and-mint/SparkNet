@@ -31,6 +31,8 @@ import {
   getClientOpportunities,
   getClientProjects,
   getClients,
+  getEukapayInvoice,
+  getEukapayInvoices,
   getMemberById,
   getMemberStatus,
   getMembers,
@@ -472,5 +474,19 @@ export const useGetUpdateFeedback = (updateId: string) => {
     queryKey: [QUERY_KEYS.GET_UPDATE_FEEDBACK, updateId],
     queryFn: () => getUpdateFeedback(updateId),
     enabled: !!updateId,
+  })
+}
+
+export const useGetEukapayInvoices = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_EUKAPAY_INVOICES],
+    queryFn: () => getEukapayInvoices(),
+  })
+}
+
+export const useGetEukapayInvoice = (code: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_EUKAPAY_INVOICE],
+    queryFn: () => getEukapayInvoice(code),
   })
 }

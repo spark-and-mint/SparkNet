@@ -1,5 +1,12 @@
 import { ID, Query } from "appwrite"
-import { appwriteConfig, account, databases, storage, avatars } from "./config"
+import {
+  appwriteConfig,
+  account,
+  databases,
+  storage,
+  avatars,
+  functions,
+} from "./config"
 import {
   IClient,
   IDocument,
@@ -878,6 +885,7 @@ export async function createDocument(document: IDocument) {
         title: document.title,
         link: document.link,
         status: document.status,
+        code: document.code,
         invoice: document.invoice,
       }
     )
@@ -942,5 +950,48 @@ export async function getUpdateFeedback(updateId?: string) {
     return feedback.documents
   } catch (error) {
     console.log(error)
+  }
+}
+
+export async function getEukapayInvoices() {
+  try {
+    const execution = await functions.createExecution("665efb6900291e00ae75")
+
+    if (
+      execution.responseStatusCode >= 200 &&
+      execution.responseStatusCode < 300
+    ) {
+      return JSON.parse(execution.responseBody)
+    } else {
+      throw new Error(
+        `Function execution failed with status ${execution.responseStatusCode}: ${execution.responseBody}`
+      )
+    }
+  } catch (error) {
+    console.error("Error fetching invoices from server:", error)
+    throw error
+  }
+}
+
+export async function getEukapayInvoice(code: string) {
+  try {
+    const execution = await functions.createExecution(
+      "665f369b001ce922f8f5",
+      code
+    )
+
+    if (
+      execution.responseStatusCode >= 200 &&
+      execution.responseStatusCode < 300
+    ) {
+      return JSON.parse(execution.responseBody)
+    } else {
+      throw new Error(
+        `Function execution failed with status ${execution.responseStatusCode}: ${execution.responseBody}`
+      )
+    }
+  } catch (error) {
+    console.error("Error fetching invoices from server:", error)
+    throw error
   }
 }

@@ -38,4 +38,8 @@ export enum QUERY_KEYS {
   // REQUEST KEYS
   GET_REQUEST_STATUS = "getRequestStatus",
   GET_REQUESTS = "getRequests",
+
+  // EUKAPAY KEYS
+  GET_EUKAPAY_INVOICES = "getEukapayInvoices",
+  GET_EUKAPAY_INVOICE = "getEukapayInvoice",
 }

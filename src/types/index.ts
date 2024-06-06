@@ -109,14 +109,17 @@ export type IUpdateStakeholder = {
 export type IDocument = {
   clientId: string
   title: string
-  link: string
+  link?: string
+  code?: string
   status?: string
   invoice?: boolean
 }
 
 export type IUpdateDocument = {
   documentId: string
-  status: string
+  link?: string
+  status?: string
+  code?: string
   invoice?: boolean
 }
 

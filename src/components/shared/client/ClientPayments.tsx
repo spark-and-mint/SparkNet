@@ -12,9 +12,8 @@ import { z } from "zod"
 import { useClient } from "@/context/ClientContext"
 import {
   useCreateDocument,
-  useDeleteDocument,
   useGetClientDocuments,
-  useUpdateDocument,
+  useGetEukapayInvoices,
 } from "@/lib/react-query/queries"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
@@ -27,34 +26,34 @@ import {
   SelectValue,
 } from "@/components/ui"
 import { Separator } from "@/components/ui/separator"
-import { ExternalLink, PlusIcon, RotateCw, Trash2 } from "lucide-react"
+import { PlusIcon, RotateCw } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Models } from "appwrite"
 import Loader from "../Loader"
-import { Link } from "react-router-dom"
+import Invoice from "./Invoice"
+import { useEffect, useState } from "react"
 
-const clientDocumentsSchema = z.object({
+const clientInvoiceSchema = z.object({
   documents: z.array(
     z.object({
       title: z.string().min(1, { message: "Can't be empty." }),
-      link: z.string().url({
-        message: "Invalid url. Please add https.",
-      }),
-      status: z.string().optional(),
+      code: z.string().min(1, { message: "Can't be empty." }),
     })
   ),
 })
 
-type ClientDocumentsValues = z.infer<typeof clientDocumentsSchema>
+type ClientDocumentsValues = z.infer<typeof clientInvoiceSchema>
 
 const ClientDocuments = () => {
   const client = useClient()
   const { data: documents, isPending: isPendingDocuments } =
     useGetClientDocuments(client.$id)
+  const { data: eukapayInvoiceData } = useGetEukapayInvoices()
+  const [eukapayInvoices, setEukapayInvoices] = useState([])
   const invoices = documents?.documents.filter((doc) => doc.invoice === true)
 
   const form = useForm<ClientDocumentsValues>({
-    resolver: zodResolver(clientDocumentsSchema),
+    resolver: zodResolver(clientInvoiceSchema),
     mode: "onChange",
   })
 
@@ -65,24 +64,18 @@ const ClientDocuments = () => {
 
   const { mutateAsync: createDocument, isPending: isLoadingCreate } =
     useCreateDocument()
-  const { mutateAsync: updateDocument } = useUpdateDocument()
-  const { mutateAsync: deleteDocument } = useDeleteDocument()
 
   const handleSubmit = async (value: ClientDocumentsValues) => {
-    console.log(fields)
     try {
       const updatedDocuments = await Promise.all(
-        value.documents.map(
-          (document: { title: string; link: string; status?: string }) => {
-            return createDocument({
-              clientId: client.$id,
-              title: document.title,
-              link: document.link,
-              status: "Awaiting Payment",
-              invoice: true,
-            })
-          }
-        )
+        value.documents.map((document: { title: string; code: string }) => {
+          return createDocument({
+            clientId: client.$id,
+            title: document.title,
+            code: document.code,
+            invoice: true,
+          })
+        })
       )
 
       if (updatedDocuments) {
@@ -96,37 +89,18 @@ const ClientDocuments = () => {
     }
   }
 
-  const handleDelete = (documentId: string) => {
-    try {
-      const deletePromise = deleteDocument(documentId)
-      toast.promise(deletePromise, {
-        loading: "Deleting...",
-        success: "Document deleted successfully.",
-        error: "Could not delete document.",
-      })
-    } catch (error) {
-      toast.error("Could not delete document.")
+  useEffect(() => {
+    if (eukapayInvoiceData) {
+      const cutoffDate = new Date("2024-06-01T00:00:00.000Z")
+      const invoices = eukapayInvoiceData.filter(
+        (invoice: { createdAt: string | number | Date; status: string }) => {
+          const invoiceDate = new Date(invoice.createdAt)
+          return invoice.status !== "Paid" && invoiceDate >= cutoffDate
+        }
+      )
+      setEukapayInvoices(invoices)
     }
-  }
-
-  const documentStatuses = ["Paid", "Awaiting Payment", "Cancelled"]
-
-  const handleStatusChange = async (documentId: string, status: string) => {
-    try {
-      const updatedDocument = await updateDocument({
-        documentId,
-        status,
-      })
-
-      if (updatedDocument) {
-        toast.success(`Document status updated to ${status}.`)
-      } else {
-        toast.error("Could not update document status.")
-      }
-    } catch (error) {
-      console.error(error)
-    }
-  }
+  }, [eukapayInvoiceData])
 
   return (
     <div className="space-y-6">
@@ -149,46 +123,8 @@ const ClientDocuments = () => {
                 <>
                   {invoices && invoices.length > 0 ? (
                     <>
-                      {invoices.map((document: Models.Document) => (
-                        <div
-                          key={document.$id}
-                          className="flex items-center justify-between gap-6"
-                        >
-                          <Link to={document.link} target="_blank">
-                            <Button type="button" size="sm">
-                              {document.title}
-                              <ExternalLink className="h-4 w-4 ml-2" />
-                            </Button>
-                          </Link>
-                          <div className="flex gap-4">
-                            <Select
-                              defaultValue={document.status || ""}
-                              onValueChange={(status) =>
-                                handleStatusChange(document.$id, status)
-                              }
-                            >
-                              <SelectTrigger className="min-w-40">
-                                <SelectValue placeholder="Select status" />
-                              </SelectTrigger>
-                              <SelectContent>
-                                {documentStatuses.map((status: string) => (
-                                  <SelectItem key={status} value={status}>
-                                    {status}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              onClick={() => handleDelete(document.$id)}
-                              className="w-14"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
+                      {invoices.map((invoice: Models.Document) => (
+                        <Invoice key={invoice.$id} invoice={invoice} />
                       ))}
                     </>
                   ) : null}
@@ -212,12 +148,36 @@ const ClientDocuments = () => {
                       />
                       <FormField
                         control={form.control}
-                        name={`documents.${index}.link`}
+                        name={`documents.${index}.code`}
                         render={({ field }) => (
                           <FormItem className="relative w-full">
-                            <FormLabel>Payment link</FormLabel>
+                            <FormLabel>Invoice</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger className="min-w-40">
+                                  <SelectValue placeholder="Select invoice" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {eukapayInvoices &&
+                                    eukapayInvoices.length > 0 &&
+                                    eukapayInvoices.map(
+                                      (invoice: {
+                                        code: string
+                                        number: string
+                                      }) => (
+                                        <SelectItem
+                                          key={invoice.code}
+                                          value={invoice.code}
+                                        >
+                                          {invoice.number}
+                                        </SelectItem>
+                                      )
+                                    )}
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <FormMessage className="absolute" />
                           </FormItem>
@@ -233,7 +193,7 @@ const ClientDocuments = () => {
               variant="outline"
               size="sm"
               className={cn(fields.length > 0 ? "mt-14" : "mt-8")}
-              onClick={() => append({ title: "", link: "" })}
+              onClick={() => append({ title: "", code: "" })}
             >
               <PlusIcon className="mr-2 h-4 w-4" />
               Add invoice
