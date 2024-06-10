@@ -19,6 +19,7 @@ import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Input,
+  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -37,7 +38,8 @@ const clientInvoiceSchema = z.object({
   documents: z.array(
     z.object({
       title: z.string().min(1, { message: "Can't be empty." }),
-      code: z.string().min(1, { message: "Can't be empty." }),
+      link: z.string().optional(),
+      code: z.string().optional(),
     })
   ),
 })
@@ -68,14 +70,17 @@ const ClientDocuments = () => {
   const handleSubmit = async (value: ClientDocumentsValues) => {
     try {
       const updatedDocuments = await Promise.all(
-        value.documents.map((document: { title: string; code: string }) => {
-          return createDocument({
-            clientId: client.$id,
-            title: document.title,
-            code: document.code,
-            invoice: true,
-          })
-        })
+        value.documents.map(
+          (document: { title: string; code?: string; link?: string }) => {
+            return createDocument({
+              clientId: client.$id,
+              title: document.title,
+              code: document.code,
+              link: document.link,
+              invoice: true,
+            })
+          }
+        )
       )
 
       if (updatedDocuments) {
@@ -102,15 +107,53 @@ const ClientDocuments = () => {
     }
   }, [eukapayInvoiceData])
 
+  const handleCopy = (value: string) => {
+    navigator.clipboard.writeText(value)
+    toast.success("Copied to clipboard!")
+  }
+
   return (
-    <div className="space-y-6">
+    <div>
       <div>
         <h3 className="text-lg font-medium mb-2">Payments and invoices</h3>
         <p className="text-sm text-muted-foreground">
-          Client payment and invoice management.
+          For Stripe payment links copy and paste the Metadata from the inputs
+          below.
         </p>
       </div>
-      <Separator />
+
+      <div className="flex w-full gap-8 mt-8">
+        <div className="grid gap-1.5">
+          <Label>Key</Label>
+          <Input
+            value="client"
+            contentEditable={false}
+            className="bg-slate-100 focus-visible:ring-white"
+          />
+        </div>
+
+        <div className="grid gap-1.5 w-full max-w-[18rem]">
+          <Label>Value</Label>
+          <div className="relative">
+            <Input
+              value={client.$id}
+              contentEditable={false}
+              className="bg-slate-100 focus-visible:ring-white"
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => handleCopy(client.$id)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 h-7"
+            >
+              Copy
+            </Button>
+          </div>
+        </div>
+      </div>
+
+      <Separator className="my-8" />
+
       {isPendingDocuments ? (
         <Loader className="justify-start h-8" />
       ) : (
@@ -122,11 +165,11 @@ const ClientDocuments = () => {
               ) : (
                 <>
                   {invoices && invoices.length > 0 ? (
-                    <>
+                    <div className="space-y-8">
                       {invoices.map((invoice: Models.Document) => (
                         <Invoice key={invoice.$id} invoice={invoice} />
                       ))}
-                    </>
+                    </div>
                   ) : null}
                   {fields.map((field, index) => (
                     <div
@@ -137,8 +180,21 @@ const ClientDocuments = () => {
                         control={form.control}
                         name={`documents.${index}.title`}
                         render={({ field }) => (
-                          <FormItem className="relative w-3/4">
+                          <FormItem className="w-full">
                             <FormLabel>Title</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage className="absolute" />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={form.control}
+                        name={`documents.${index}.link`}
+                        render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel>Stripe payment link</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
@@ -150,8 +206,8 @@ const ClientDocuments = () => {
                         control={form.control}
                         name={`documents.${index}.code`}
                         render={({ field }) => (
-                          <FormItem className="relative w-full">
-                            <FormLabel>Invoice</FormLabel>
+                          <FormItem className="w-full">
+                            <FormLabel>EukaPay invoice</FormLabel>
                             <FormControl>
                               <Select
                                 onValueChange={field.onChange}
@@ -192,7 +248,7 @@ const ClientDocuments = () => {
               type="button"
               variant="outline"
               size="sm"
-              className={cn(fields.length > 0 ? "mt-14" : "mt-8")}
+              className={cn(fields.length > 0 ? "mt-14" : "mt-10")}
               onClick={() => append({ title: "", code: "" })}
             >
               <PlusIcon className="mr-2 h-4 w-4" />
