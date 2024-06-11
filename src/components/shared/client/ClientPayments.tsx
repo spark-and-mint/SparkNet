@@ -14,12 +14,13 @@ import {
   useCreateDocument,
   useGetClientDocuments,
   useGetEukapayInvoices,
+  useGetInvoiceData,
+  useGetStripePaymentLinks,
 } from "@/lib/react-query/queries"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import {
   Input,
-  Label,
   Select,
   SelectContent,
   SelectItem,
@@ -38,21 +39,51 @@ const clientInvoiceSchema = z.object({
   documents: z.array(
     z.object({
       title: z.string().min(1, { message: "Can't be empty." }),
-      link: z.string().optional(),
-      code: z.string().optional(),
+      stripeId: z.string().optional(),
+      eukapayId: z.string().optional(),
     })
   ),
 })
 
 type ClientDocumentsValues = z.infer<typeof clientInvoiceSchema>
 
+const InvoiceList = ({ invoices }) => {
+  const { data: invoiceData, isPending, isError } = useGetInvoiceData(invoices)
+
+  if (isPending) {
+    return <Loader className="justify-start h-8" />
+  }
+
+  if (isError) {
+    return <p>Error loading invoices.</p>
+  }
+
+  return (
+    <div className="space-y-8">
+      {invoiceData.map((invoiceData) => (
+        <Invoice
+          key={invoiceData.id}
+          id={invoiceData.id}
+          createdAt={invoiceData.createdAt}
+          title={invoiceData.title}
+          eukapayInvoice={invoiceData.eukapayInvoice}
+          stripePayment={invoiceData.stripePayment}
+        />
+      ))}
+    </div>
+  )
+}
+
 const ClientDocuments = () => {
   const client = useClient()
   const { data: documents, isPending: isPendingDocuments } =
     useGetClientDocuments(client.$id)
-  const { data: eukapayInvoiceData } = useGetEukapayInvoices()
+  const { data: eukapayInvoiceData, isPending: isPendingEukapay } =
+    useGetEukapayInvoices()
+  const { data: stripePaymentLinks, isPending: isPendingStripe } =
+    useGetStripePaymentLinks()
   const [eukapayInvoices, setEukapayInvoices] = useState([])
-  const invoices = documents?.documents.filter((doc) => doc.invoice === true)
+  const [invoices, setInvoices] = useState<Models.Document[]>([])
 
   const form = useForm<ClientDocumentsValues>({
     resolver: zodResolver(clientInvoiceSchema),
@@ -71,12 +102,16 @@ const ClientDocuments = () => {
     try {
       const updatedDocuments = await Promise.all(
         value.documents.map(
-          (document: { title: string; code?: string; link?: string }) => {
+          (document: {
+            title: string
+            eukapayId?: string
+            stripeId?: string
+          }) => {
             return createDocument({
               clientId: client.$id,
               title: document.title,
-              code: document.code,
-              link: document.link,
+              eukapayId: document.eukapayId,
+              stripeId: document.stripeId,
               invoice: true,
             })
           }
@@ -95,6 +130,13 @@ const ClientDocuments = () => {
   }
 
   useEffect(() => {
+    const invoices = documents?.documents.filter((doc) => doc.invoice === true)
+    if (invoices) {
+      setInvoices(invoices)
+    }
+  }, [documents])
+
+  useEffect(() => {
     if (eukapayInvoiceData) {
       const cutoffDate = new Date("2024-06-01T00:00:00.000Z")
       const invoices = eukapayInvoiceData.filter(
@@ -107,54 +149,18 @@ const ClientDocuments = () => {
     }
   }, [eukapayInvoiceData])
 
-  const handleCopy = (value: string) => {
-    navigator.clipboard.writeText(value)
-    toast.success("Copied to clipboard!")
-  }
-
   return (
     <div>
       <div>
         <h3 className="text-lg font-medium mb-2">Payments and invoices</h3>
         <p className="text-sm text-muted-foreground">
-          For Stripe payment links copy and paste the Metadata from the inputs
-          below.
+          Add EukaPay invoices and Stripe payment links to this client.
         </p>
-      </div>
-
-      <div className="flex w-full gap-8 mt-8">
-        <div className="grid gap-1.5">
-          <Label>Key</Label>
-          <Input
-            value="client"
-            contentEditable={false}
-            className="bg-slate-100 focus-visible:ring-white"
-          />
-        </div>
-
-        <div className="grid gap-1.5 w-full max-w-[18rem]">
-          <Label>Value</Label>
-          <div className="relative">
-            <Input
-              value={client.$id}
-              contentEditable={false}
-              className="bg-slate-100 focus-visible:ring-white"
-            />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleCopy(client.$id)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-7"
-            >
-              Copy
-            </Button>
-          </div>
-        </div>
       </div>
 
       <Separator className="my-8" />
 
-      {isPendingDocuments ? (
+      {isPendingDocuments || isPendingEukapay || isPendingStripe ? (
         <Loader className="justify-start h-8" />
       ) : (
         <Form {...form}>
@@ -165,11 +171,7 @@ const ClientDocuments = () => {
               ) : (
                 <>
                   {invoices && invoices.length > 0 ? (
-                    <div className="space-y-8">
-                      {invoices.map((invoice: Models.Document) => (
-                        <Invoice key={invoice.$id} invoice={invoice} />
-                      ))}
-                    </div>
+                    <InvoiceList invoices={invoices} />
                   ) : null}
                   {fields.map((field, index) => (
                     <div
@@ -191,12 +193,36 @@ const ClientDocuments = () => {
                       />
                       <FormField
                         control={form.control}
-                        name={`documents.${index}.link`}
+                        name={`documents.${index}.stripeId`}
                         render={({ field }) => (
                           <FormItem className="w-full">
                             <FormLabel>Stripe payment link</FormLabel>
                             <FormControl>
-                              <Input {...field} />
+                              <Select
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                              >
+                                <SelectTrigger className="min-w-40">
+                                  <SelectValue placeholder="Select payment" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {stripePaymentLinks &&
+                                    stripePaymentLinks.length > 0 &&
+                                    stripePaymentLinks.map(
+                                      (paymentLink: {
+                                        id: string
+                                        name: string
+                                      }) => (
+                                        <SelectItem
+                                          key={paymentLink.id}
+                                          value={paymentLink.id}
+                                        >
+                                          {paymentLink.name}
+                                        </SelectItem>
+                                      )
+                                    )}
+                                </SelectContent>
+                              </Select>
                             </FormControl>
                             <FormMessage className="absolute" />
                           </FormItem>
@@ -204,7 +230,7 @@ const ClientDocuments = () => {
                       />
                       <FormField
                         control={form.control}
-                        name={`documents.${index}.code`}
+                        name={`documents.${index}.eukapayId`}
                         render={({ field }) => (
                           <FormItem className="w-full">
                             <FormLabel>EukaPay invoice</FormLabel>
@@ -249,7 +275,7 @@ const ClientDocuments = () => {
               variant="outline"
               size="sm"
               className={cn(fields.length > 0 ? "mt-14" : "mt-10")}
-              onClick={() => append({ title: "", code: "" })}
+              onClick={() => append({ title: "", eukapayId: "" })}
             >
               <PlusIcon className="mr-2 h-4 w-4" />
               Add invoice

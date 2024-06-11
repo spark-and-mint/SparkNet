@@ -110,17 +110,15 @@ export type IDocument = {
   clientId: string
   title: string
   link?: string
-  code?: string
+  stripeId?: string
+  eukapayId?: string
   status?: string
   invoice?: boolean
 }
 
 export type IUpdateDocument = {
   documentId: string
-  link?: string
-  status?: string
-  code?: string
-  invoice?: boolean
+  status: string
 }
 
 export type IOption = {

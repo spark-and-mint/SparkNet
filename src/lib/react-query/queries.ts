@@ -33,6 +33,7 @@ import {
   getClients,
   getEukapayInvoice,
   getEukapayInvoices,
+  getInvoiceData,
   getMemberById,
   getMemberStatus,
   getMembers,
@@ -46,6 +47,8 @@ import {
   getRequestStatus,
   getRequests,
   getStakeholders,
+  getStripePayment,
+  getStripePaymentLinks,
   getUpdateFeedback,
   signInAccount,
   signOutAccount,
@@ -59,6 +62,7 @@ import {
   updateStakeholder,
 } from "../appwrite/api"
 import { QUERY_KEYS } from "./queryKeys"
+import { Models } from "appwrite"
 
 export const useCreateOpportunity = () => {
   const queryClient = useQueryClient()
@@ -488,5 +492,29 @@ export const useGetEukapayInvoice = (code: string) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_EUKAPAY_INVOICE],
     queryFn: () => getEukapayInvoice(code),
+    enabled: !!code,
+  })
+}
+
+export const useGetStripePaymentLinks = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_STRIPE_PAYMENT_LINKS],
+    queryFn: () => getStripePaymentLinks(),
+  })
+}
+
+export const useGetStripePayment = (id: string) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_STRIPE_PAYMENT_LINK],
+    queryFn: () => getStripePayment(id),
+    enabled: !!id,
+  })
+}
+
+export const useGetInvoiceData = (invoices: Models.Document[]) => {
+  return useQuery({
+    queryKey: ["GET_INVOICE_DATA", invoices],
+    queryFn: () => getInvoiceData(invoices),
+    enabled: invoices.length > 0,
   })
 }

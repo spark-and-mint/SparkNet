@@ -1,48 +1,44 @@
 import { Button } from "@/components/ui"
-import {
-  useDeleteDocument,
-  useGetEukapayInvoice,
-} from "@/lib/react-query/queries"
-import { Models } from "appwrite"
-import { ExternalLink, Trash2 } from "lucide-react"
+import { useDeleteDocument } from "@/lib/react-query/queries"
+import { Check, ExternalLink, Trash2 } from "lucide-react"
 import { Link } from "react-router-dom"
 import { toast } from "sonner"
-import Loader from "../Loader"
 import { Badge } from "@/components/ui/badge"
 import { useConfirm } from "../AlertDialogProvider"
+import { useEffect, useState } from "react"
 
-const Invoice = ({ invoice }: { invoice: Models.Document }) => {
-  const { data: eukapayInvoice, isPending: isPendingInvoice } =
-    useGetEukapayInvoice(invoice.code)
+const Invoice = ({ id, createdAt, title, eukapayInvoice, stripePayment }) => {
   const { mutateAsync: deleteDocument } = useDeleteDocument()
   const confirm = useConfirm()
+  const [isPaidEukaPay, setIsPaidEukaPay] = useState(false)
+  const [isPaidStripe, setIsPaidStripe] = useState(false)
 
-  const getStatus = (status: string) => {
-    switch (status) {
-      case "Paid":
-        return (
-          <Badge
-            variant="outline"
-            className="rounded-md text-[0.65rem] px-1.5 py-0.5 bg-green-100 text-green-600"
-          >
-            {status}
-          </Badge>
-        )
-      default:
-        return (
-          <Badge
-            variant="outline"
-            className="rounded-md text-[0.65rem] px-1.5 py-0.5 bg-yellow-100 text-yellow-600"
-          >
-            {status}
-          </Badge>
-        )
+  const getStatusBadge = (paid: boolean) => {
+    if (paid) {
+      return (
+        <Badge
+          variant="outline"
+          className="rounded-md text-[0.65rem] px-1.5 py-0.5 bg-green-100 text-green-600"
+        >
+          <Check strokeWidth={3} className="w-3 h-3 mr-1" />
+          Paid with {isPaidEukaPay ? "EukaPay" : "Stripe"}
+        </Badge>
+      )
+    } else {
+      return (
+        <Badge
+          variant="outline"
+          className="rounded-md text-[0.65rem] px-1.5 py-0.5 bg-yellow-100 text-yellow-600"
+        >
+          Unpaid
+        </Badge>
+      )
     }
   }
 
   const handleDelete = async (documentId: string) => {
     const deleteConfirmed = await confirm({
-      title: `Deleting ${invoice?.title} payment`,
+      title: `Deleting ${title} payment`,
       body: "Are you sure you want to do that?",
       cancelButton: "Cancel",
       actionButton: "Delete",
@@ -62,37 +58,51 @@ const Invoice = ({ invoice }: { invoice: Models.Document }) => {
     }
   }
 
-  if (isPendingInvoice) {
-    return <Loader className="justify-start h-8" />
-  }
+  useEffect(() => {
+    if (stripePayment?.paid === true) {
+      setIsPaidStripe(true)
+    } else if (eukapayInvoice?.status === "Paid") {
+      setIsPaidEukaPay(true)
+    }
+  }, [stripePayment, eukapayInvoice])
 
-  const createdAt = new Date(invoice.$createdAt).toLocaleDateString("en-US", {
+  const createdAtString = new Date(createdAt).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
   })
+
+  const paidOn = stripePayment?.paidOn
+    ? new Date(stripePayment?.paidOn).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null
 
   return (
     <div className="flex items-center justify-between gap-6">
       <div className="flex w-full justify-between gap-6">
         <div className="flex flex-col gap-1 mr-4">
           <div className="flex items-center gap-2">
-            <p className="text-sm font-medium">{invoice.title}</p>
-            {getStatus(eukapayInvoice.status)}
+            <p className="text-sm font-medium">{title}</p>
+            {getStatusBadge(isPaidEukaPay || isPaidStripe)}
           </div>
-          <p className="text-xs text-muted-foreground">Created {createdAt}</p>
+          <p className="text-xs text-muted-foreground">
+            Created {createdAtString} {paidOn && `⋅ Paid on ${paidOn}`}
+          </p>
         </div>
         <div className="flex gap-6">
-          {eukapayInvoice.paymentUrl && (
-            <Link to={eukapayInvoice.paymentUrl} target="_blank">
+          {eukapayInvoice?.paymentUrl && (
+            <Link to={eukapayInvoice?.paymentUrl} target="_blank">
               <Button type="button" size="sm">
                 EukaPay
                 <ExternalLink className="h-4 w-4 ml-2" />
               </Button>
             </Link>
           )}
-          {invoice.link && (
-            <Link to={invoice.link} target="_blank">
+          {stripePayment?.url && (
+            <Link to={stripePayment?.url} target="_blank">
               <Button type="button" size="sm">
                 Stripe
                 <ExternalLink className="h-4 w-4 ml-2" />
@@ -106,7 +116,7 @@ const Invoice = ({ invoice }: { invoice: Models.Document }) => {
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => handleDelete(invoice.$id)}
+          onClick={() => handleDelete(id)}
           className="w-10"
         >
           <Trash2 className="h-4 w-4" />

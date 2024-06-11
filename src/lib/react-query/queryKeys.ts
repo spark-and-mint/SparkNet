@@ -42,4 +42,8 @@ export enum QUERY_KEYS {
   // EUKAPAY KEYS
   GET_EUKAPAY_INVOICES = "getEukapayInvoices",
   GET_EUKAPAY_INVOICE = "getEukapayInvoice",
+
+  // STRIPE KEYS
+  GET_STRIPE_PAYMENT_LINKS = "getStripePaymentLinks",
+  GET_STRIPE_PAYMENT_LINK = "getStripePaymentLink",
 }

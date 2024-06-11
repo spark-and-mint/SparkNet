@@ -1,4 +1,4 @@
-import { ID, Query } from "appwrite"
+import { ID, Models, Query } from "appwrite"
 import {
   appwriteConfig,
   account,
@@ -885,7 +885,8 @@ export async function createDocument(document: IDocument) {
         title: document.title,
         link: document.link,
         status: document.status,
-        code: document.code,
+        stripeId: document.stripeId,
+        eukapayId: document.eukapayId,
         invoice: document.invoice,
       }
     )
@@ -994,4 +995,112 @@ export async function getEukapayInvoice(code: string) {
     console.error("Error fetching invoices from server:", error)
     throw error
   }
+}
+
+export async function getStripePaymentLinks() {
+  try {
+    const execution = await functions.createExecution("66682cab0002eb009ad7")
+
+    if (
+      execution.responseStatusCode >= 200 &&
+      execution.responseStatusCode < 300
+    ) {
+      return JSON.parse(execution.responseBody)
+    } else {
+      throw new Error(
+        `Function execution failed with status ${execution.responseStatusCode}: ${execution.responseBody}`
+      )
+    }
+  } catch (error) {
+    console.error("Error fetching payment links from server:", error)
+    throw error
+  }
+}
+
+export async function getStripePayment(id: string) {
+  try {
+    const execution = await functions.createExecution(
+      "6667045d000c65a2ddcb",
+      id
+    )
+
+    if (
+      execution.responseStatusCode >= 200 &&
+      execution.responseStatusCode < 300
+    ) {
+      return JSON.parse(execution.responseBody)
+    } else {
+      throw new Error(
+        `Function execution failed with status ${execution.responseStatusCode}: ${execution.responseBody}`
+      )
+    }
+  } catch (error) {
+    console.error("Error fetching payment from server: ", error)
+    throw error
+  }
+}
+
+const createExecution = async (functionId: string, payload: string) => {
+  try {
+    const execution = await functions.createExecution(functionId, payload)
+    if (
+      execution.responseStatusCode >= 200 &&
+      execution.responseStatusCode < 300
+    ) {
+      return JSON.parse(execution.responseBody)
+    } else {
+      throw new Error(
+        `Function execution failed with status ${execution.responseStatusCode}: ${execution.responseBody}`
+      )
+    }
+  } catch (error) {
+    console.error(`Error fetching data from function ${functionId}: `, error)
+    throw error
+  }
+}
+
+export const getInvoiceData = async (invoices: Models.Document[]) => {
+  const results: any[] = []
+
+  for (const invoice of invoices) {
+    const result = {
+      id: invoice.$id,
+      createdAt: invoice.$createdAt,
+      title: invoice.title,
+      eukapayInvoice: null,
+      stripePayment: null,
+    }
+
+    if (invoice.eukapayId) {
+      try {
+        result.eukapayInvoice = await createExecution(
+          "665f369b001ce922f8f5",
+          invoice.eukapayId
+        )
+      } catch (error) {
+        console.error(
+          `Error processing eukapay invoice ID ${invoice.eukapayId}:`,
+          error
+        )
+      }
+    }
+
+    if (invoice.stripeId) {
+      try {
+        result.stripePayment = await createExecution(
+          "6667045d000c65a2ddcb",
+          invoice.stripeId
+        )
+      } catch (error) {
+        console.error(
+          `Error processing stripe payment ID ${invoice.stripeId}:`,
+          error
+        )
+      }
+    }
+
+    results.push(result)
+  }
+
+  return results
 }
