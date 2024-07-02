@@ -33,6 +33,7 @@ import {
   getClients,
   getEukapayInvoice,
   getEukapayInvoices,
+  getFeedbackRequests,
   getInvoiceData,
   getMemberById,
   getMemberStatus,
@@ -250,6 +251,13 @@ export const useGetRequests = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_REQUESTS],
     queryFn: getRequests,
+  })
+}
+
+export const useGetFeedbackRequests = () => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.GET_FEEDBACK_REQUESTS],
+    queryFn: getFeedbackRequests,
   })
 }
 

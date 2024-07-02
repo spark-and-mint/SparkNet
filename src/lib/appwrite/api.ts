@@ -111,6 +111,18 @@ export async function getRequests() {
   return requests
 }
 
+export async function getFeedbackRequests() {
+  const feedbackRequests = await databases.listDocuments(
+    appwriteConfig.databaseId,
+    appwriteConfig.feedbackRequestCollectionId,
+    [Query.limit(100), Query.orderDesc("$createdAt")]
+  )
+
+  if (!feedbackRequests) throw Error
+
+  return feedbackRequests
+}
+
 export async function getStakeholders() {
   const stakeholders = await databases.listDocuments(
     appwriteConfig.databaseId,

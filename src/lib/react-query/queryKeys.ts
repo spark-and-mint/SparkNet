@@ -46,4 +46,7 @@ export enum QUERY_KEYS {
   // STRIPE KEYS
   GET_STRIPE_PAYMENT_LINKS = "getStripePaymentLinks",
   GET_STRIPE_PAYMENT_LINK = "getStripePaymentLink",
+
+  // FEEDBACK REQUEST KEYS
+  GET_FEEDBACK_REQUESTS = "getFeedbackRequests",
 }

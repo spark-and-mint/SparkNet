@@ -15,6 +15,7 @@ import Applicants from "./_root/pages/Applicants"
 import ClientStakeholders from "./components/shared/client/ClientStakeholders"
 import StakeholderTable from "./components/shared/StakeholderTable"
 import ClientPayments from "./components/shared/client/ClientPayments"
+import FeedbackRequestTable from "./components/shared/FeedbackRequestTable"
 
 const App = () => (
   <main>
@@ -27,6 +28,7 @@ const App = () => (
         <Route index element={<Home />} />
         <Route path="/stakeholders" element={<StakeholderTable />} />
         <Route path="/applicants" element={<Applicants />} />
+        <Route path="/feedback" element={<FeedbackRequestTable />} />
         <Route path="/members" element={<Members />} />
         <Route path="/clients" element={<Clients />} />
         <Route element={<ClientLayout />}>
