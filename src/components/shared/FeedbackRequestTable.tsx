@@ -27,8 +27,8 @@ import { Link } from "react-router-dom"
 
 import { RankingInfo } from "@tanstack/match-sorter-utils"
 import { fuzzyFilter, fuzzySort } from "@/lib/utils"
-import RequestDialog from "@/_root/pages/RequestDialog"
 import RequestStatusSelect from "./RequestStatusSelect"
+import FeedbackRequestDialog from "@/_root/pages/FeedbackRequestDialog"
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -142,17 +142,6 @@ const FeedbackRequestTable = () => {
           return (
             <div className="capitalize text-sm">
               {row.getValue("timeFrame")}
-            </div>
-          )
-        },
-      },
-      {
-        accessorKey: "link",
-        header: "Project link",
-        cell: ({ row }) => {
-          return (
-            <div className="capitalize text-sm">
-              <Link to={row.getValue("link")}>{row.getValue("link")}</Link>
             </div>
           )
         },
@@ -280,7 +269,7 @@ const FeedbackRequestTable = () => {
           </Table>
         </div>
       </div>
-      <RequestDialog
+      <FeedbackRequestDialog
         open={showRequestDialog}
         onOpenChange={setShowRequestDialog}
         request={selectedRequest}
