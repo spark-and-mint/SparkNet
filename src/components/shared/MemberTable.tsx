@@ -4,6 +4,7 @@ import {
   FilterFn,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   useReactTable,
 } from "@tanstack/react-table"
 import { RotateCw } from "lucide-react"
@@ -192,8 +193,23 @@ const MemberTable = () => {
       fuzzy: fuzzyFilter,
     },
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, _, filterValue) => {
+      const search = filterValue.toLowerCase()
+      const name =
+        `${row.original.firstName} ${row.original.lastName}`.toLowerCase()
+      const skills = (row.original.skills || []).map((skill: string) =>
+        skill.toLowerCase()
+      )
+
+      return (
+        name.includes(search) ||
+        skills.some((skill: string) => skill.includes(search))
+      )
     },
   })
 
@@ -217,9 +233,10 @@ const MemberTable = () => {
           <DebouncedInput
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
-            placeholder="Search..."
-            disabled
+            placeholder="Search names and skills..."
+            className="max-w-sm"
           />
+
           {members.length > 0 && <p>Total members: {members.length}</p>}
         </div>
 

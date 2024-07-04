@@ -5,6 +5,7 @@ import {
   SortingState,
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
@@ -198,9 +199,24 @@ const ApplicantTable = () => {
       fuzzy: fuzzyFilter,
     },
     getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
     state: {
       sorting,
       globalFilter,
+    },
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: (row, _, filterValue) => {
+      const search = filterValue.toLowerCase()
+      const name =
+        `${row.original.firstName} ${row.original.lastName}`.toLowerCase()
+      const skills = (row.original.skills || []).map((skill: string) =>
+        skill.toLowerCase()
+      )
+
+      return (
+        name.includes(search) ||
+        skills.some((skill: string) => skill.includes(search))
+      )
     },
   })
 
@@ -224,8 +240,7 @@ const ApplicantTable = () => {
           <DebouncedInput
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
-            placeholder="Search..."
-            disabled
+            placeholder="Search names and skills..."
           />
           {members.length > 0 && <p>Total applicants: {members.length}</p>}
         </div>
