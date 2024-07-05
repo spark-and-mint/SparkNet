@@ -212,10 +212,14 @@ const ApplicantTable = () => {
       const skills = (row.original.skills || []).map((skill: string) =>
         skill.toLowerCase()
       )
+      const roles = (row.original.roles || []).map((role: string) =>
+        role.toLowerCase()
+      )
 
       return (
         name.includes(search) ||
-        skills.some((skill: string) => skill.includes(search))
+        skills.some((skill: string) => skill.includes(search)) ||
+        roles.some((role: string) => role.includes(search))
       )
     },
   })
@@ -240,7 +244,7 @@ const ApplicantTable = () => {
           <DebouncedInput
             value={globalFilter ?? ""}
             onChange={(value) => setGlobalFilter(String(value))}
-            placeholder="Search names and skills..."
+            placeholder="Search..."
           />
           {members.length > 0 && <p>Total applicants: {members.length}</p>}
         </div>
